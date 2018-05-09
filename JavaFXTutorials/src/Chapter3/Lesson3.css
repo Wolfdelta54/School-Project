@@ -1,0 +1,17 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+#hbox {
+	-fx-background-color: #336699;
+	-fx-alignment: CENTER;
+	-fx-padding: 15, 12, 15, 12;
+}
+
+#vbox {
+	-fx-background-color: #336699;
+	-fx-alignment: CENTER;
+	-fx-padding: 15, 12, 15, 12;
+}
+
+#textstyle {
+	-fx-font: 30px "Arail";
+	-fx-fill: white;
+}

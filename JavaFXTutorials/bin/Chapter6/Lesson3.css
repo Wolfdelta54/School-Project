@@ -1,0 +1,19 @@
+/* JavaFX CSS - Leave this comment until you have at least 
+ * create one rule which uses -fx-Property
+ */
+
+.button{
+    -fx-text-fill:white;
+    -fx-font-family:"Arial Narrow";
+    -fx-font-weight:bold;
+    -fx-background-color:linear-gradient(#61a2b1,#2A5058);
+    -fx-background-radius: 5;
+}
+#center {
+    -fx-background-color: #2f4f4f;
+    -fx-fill:  tan;
+    -fx-alignment: center;
+}
+.button, #center {
+    -fx-font:24px "Verdana";
+}
