@@ -1,0 +1,11 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+#vbox {
+	-fx-alignment: CENTER;
+	-fx-padding: 15, 12, 15, 12;
+}
+
+#lbl {
+	-fx-font-size: 16px;
+	-fx-font-family: "Arial";
+	-fx-text-fill: #2A5058;
+}

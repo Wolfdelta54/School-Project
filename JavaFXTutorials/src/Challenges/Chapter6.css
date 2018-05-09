@@ -1,0 +1,19 @@
+/* JavaFX CSS - Leave this comment until you have at least 
+ * create one rule which uses -fx-Property
+ */
+ 
+ .hbox {
+ 	-fx-alignment: CENTER;
+	-fx-padding: 15, 12, 15, 12;
+ }
+ 
+ .vbox {
+ 	-fx-alignment: CENTER;
+ 	-fx-padding: 15, 12, 15, 12;
+ }
+ 
+ .label {
+ 	-fx-text-fill: DEEPPINK;
+ 	-fx-font-weight: BOLD;
+ 	-fx-font: 16px "Arial Narrow";
+ }
