@@ -1,0 +1,7 @@
+What needs to be done:
+
+HandCheck - Shyam
+Cards, Deck, River, Hand - Thomas
+Player - Darian
+Table - Garret
+Multi-player Functionality - 
