@@ -9,7 +9,7 @@ public class DeckOfCards
 		deckOfCards = new Card[52];
 		
 		int i = 0;
-		for(int suit = Card.Diamond; suit <= Card.Spade; suit++)
+		for(int suit = Card.DIAMONDS; suit <= Card.SPADES; suit++)
 		{
 			for(int rank = 1; rank <= 13; rank++)
 			{
