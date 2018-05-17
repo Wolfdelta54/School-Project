@@ -10,9 +10,8 @@ public class Player {
 //	public Hand hand;
 	public boolean isActive = true; // Used to determine if the Player is still in the round
 	public boolean isCurrent = false; // Used to determine if the Player is the currently Active Player
-	public Button fold = new Button("Fold"), call = new Button("Call"), raise = new Button("Raise"),
-			bet = new Button("Bet"), check = new Button("Check"); // Buttons for each different action the Player can take
-	public TextField betAmount; // Player inputs the amount they wish to bet/raise
+	public String betAmount = "";
+//	public ArrayList<Card> cards = new ArrayList<Card>();
 	
 	public Player(String name) {
 		this.name = name;
@@ -42,7 +41,7 @@ public class Player {
 		return potIn;
 	}
 	
-	public void updateBal(int amount) {
+	public void updateBal(int amount, TextField betAmount) {
 		if(amount < 0) {
 			int temp = Math.abs(amount);
 			if(temp <= bal && isCurrent == true) {
@@ -63,5 +62,21 @@ public class Player {
 		else if(amount > 0) {
 			bal += amount;
 		}
+	}
+	
+/*	public void addToHand(Card card) {
+		cards.add(card);
+		
+		if(cards.size() == 2) {
+			hand = new Hand(cards);
+		}
+	} */
+	
+	public void setActive(boolean status) {
+		isActive = status;
+	}
+	
+	public void setCurrent(boolean status) {
+		isCurrent = status;
 	}
 }
