@@ -45,7 +45,7 @@ public class HandCheck
 	//make method to sequence the cards in one hand from lowest to highest SUIT
 	public void sortBySuit()
 	{
-        ArrayList.sort(availableCards, new suitComparator());
+        ArrayList.sort(availableCards, new suitComparator()); //ORDER OF SUITS = spades, hearts, clubs, diamond
     }
 
 	//make method to sequence the cards in one hand from lowest to highest SUIT and then RANK
@@ -57,45 +57,88 @@ public class HandCheck
     //make method to sequence the cards in one hand from lowest to highest RANK and then SUIT
     public void sortByRankThenSuit()
     {
-        ArrayList.sort(availableCards, new rankComparator());
-        ArrayList.sort(availableCards, new suitComparator());
+        ArrayList.sort(availableCards, new rankComparator()); 
+        ArrayList.sort(availableCards, new suitComparator()); //ORDER OF SUITS = spades, hearts, clubs, diamond
     }
 	public String checkHands()
 	{
 		String result = ""; 
-		//ORDER OF SUITS = spades, hearts, clubs, diamond
+		ArrayList<Integer> rankCounter;
+	    ArrayList<Integer> suitCounter;
+	    
+		// Loop through sorted cards and total ranks
+        for(int i=0; i<availableCards.size();i++)
+        {
+            rankCounter.add(availableCards.get(i).getRank());
+            suitCounter.add(availableCards.get(i).getSuit());
+        }
+
+        //sort cards for evaluation
+        this.sortByRankThenSuit();
+
+        //hands are already sorted by rank and suit for royal and straight flush checks.
+        
+        //is royal flush?
+
+        //is straight flush?
+       
+        //is four of a kind?
+        
+        //is full house?
+        
+        //is flush?
+        
+        //is straight?
+        
+        //is three of a kind?
+        
+        //is two pair?
+        
+        //is one pair?
+        
+        //is highest hand? 
+        }
+
+	//ORDER OF SUITS = spades, hearts, clubs, diamond
 		
-		//RoyalFlush - 10JQKA of same suit
-		for(int i=0; i<availableCards.size(); i++)
+	//RoyalFlush - 10JQKA of same suit
+	
+	private String royalFlush(ArrayList<Integer> rankCounter, ArrayList<Integer> suitCounter)
+	{
+		for(int i=0; i<availableCards.size(); i++) //go through all available cards 
 		{
-			if(availableCards.get(i).getCards().getSuit().equals("spades"))
-			{
-				if(availableCards.get(0).getCards().getValue.equals("10") && availableCards.get(1).getCards().getValue.equals("J") && availableCards.get(2).getCards().getValue.equals("Q") &&
-						availableCards.get(3).getCards().getValue.equals("K") && availableCards.get(4).getCards().getValue.equals("A"))
-					howWin = "Royal Flush Spades"; 
-			}
-			if(availableCards.get(i).getCards().getSuit().equals("hearts"))
-			{
-				if(availableCards.get(0).getCards().getValue.equals("10") && availableCards.get(1).getCards().getValue.equals("J") && availableCards.get(2).getCards().getValue.equals("Q") &&
-						availableCards.get(3).getCards().getValue.equals("K") && availableCards.get(4).getCards().getValue.equals("A"))
-					howWin = "Royal Flush Hearts";
-			}
-			if(availableCards.get(i).getCards().getSuit().equals("clubs"))
-			{
-				if(availableCards.get(0).getCards().getValue.equals("10") && availableCards.get(1).getCards().getValue.equals("J") && availableCards.get(2).getCards().getValue.equals("Q") &&
-						availableCards.get(3).getCards().getValue.equals("K") && availableCards.get(4).getCards().getValue.equals("A"))
-					howWin = "Royal Flush Clubs";
-			}
-			
-			if(availableCards.get(i).getCards().getSuit().equals("diamonds"))
-			{
-				if(availableCards.get(0).getCards().getValue.equals("10") && availableCards.get(1).getCards().getValue.equals("J") && availableCards.get(2).getCards().getValue.equals("Q") &&
-						availableCards.get(3).getCards().getValue.equals("K") && availableCards.get(4).getCards().getValue.equals("A"))
-					howWin = "Royal Flush Diamonds";
-			}
+				if(availableCards.get(i).getCards().getSuit() == 4) //checks to see if all are spades
+				{
+					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
+							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
+						return "Royal Flush Spades"; 
+				}
+				
+				if(availableCards.get(i).getCards().getSuit() == 3) //checks to see if all are hearts
+				{
+					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
+							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
+						return "Royal Flush Hearts";
+				}
+				if(availableCards.get(i).getCards().getSuit() == 2) //checks to see if all are clubs
+				{
+					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
+							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
+						return "Royal Flush Clubs";
+				}
+
+				if(availableCards.get(i).getCards().getSuit() == 1) //checks to see if all are diamond
+				{
+					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
+							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
+						return "Royal Flush Diamonds";
+				}
+		}
+		
+	}
 
 		//StraightFlush - sequential numbers of same suit
-		
+			
 		//FourOfAKind - four of same card
 		
 		//FullHouse - pair of matching cards + three other matching
@@ -111,7 +154,6 @@ public class HandCheck
 		//OnePair - one pair of same cards 
 		
 		//HighHand - highest card wins 
-		}
-	}
+		
 	
 }
