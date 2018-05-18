@@ -37,4 +37,14 @@ public class DeckOfCards
 			deckOfCards[z] = shuffle;
 		}
 	}
+	
+	int i = 0;
+	
+	// Locates the top card in the deck
+	public Card nextCard()
+	{
+		Card topCard = deckOfCards[i];
+		i++;
+		return topCard;
+	}
 }
