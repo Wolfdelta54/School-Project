@@ -107,33 +107,35 @@ public class HandCheck
 	{
 		for(int i=0; i<availableCards.size(); i++) //go through all available cards 
 		{
-				if(availableCards.get(i).getCards().getSuit() == 4) //checks to see if all are spades
+				if(availableCards.get(i).getSuit() == 4) //checks to see if all are spades
 				{
 					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
 							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Spades"; 
 				}
 				
-				if(availableCards.get(i).getCards().getSuit() == 3) //checks to see if all are hearts
+				if(availableCards.get(i).getSuit() == 3) //checks to see if all are hearts
 				{
 					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
 							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Hearts";
 				}
-				if(availableCards.get(i).getCards().getSuit() == 2) //checks to see if all are clubs
+				if(availableCards.get(i).getSuit() == 2) //checks to see if all are clubs
 				{
 					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
 							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Clubs";
 				}
 
-				if(availableCards.get(i).getCards().getSuit() == 1) //checks to see if all are diamond
+				if(availableCards.get(i).getSuit() == 1) //checks to see if all are diamond
 				{
 					if((rankCounter.get(0) == 10 && rankCounter.get(1) == 11 && rankCounter.get(2) == 12 && rankCounter.get(3) == 13 && rankCounter.get(4) == 14 
 							||rankCounter.get(0) == 14 && rankCounter.get(1) == 10 && rankCounter.get(2) == 11 && rankCounter.get(3) == 12 && rankCounter.get(4) == 13)) //Goes through rankCounter list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Diamonds";
 				}
 		}
+		
+		return ""; 
 		
 	}
 
