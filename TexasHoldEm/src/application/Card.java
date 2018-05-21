@@ -27,6 +27,7 @@ public class Card
 	 * Example: value = (10 * 14(ACE)) + 4(SPADES) = 144 (ACE OF SPADES) */
 	private int value;
 	
+	// Sets value for a card
 	public Card(int suit, int rank)
 	{
 		if(rank == 1)
@@ -35,7 +36,7 @@ public class Card
 			value = (10 * rank) + suit;
 	}
 	
-	public int suit()
+	public int getSuit()
 	{
 		return value % 10; // Example: ACE OF SPADES = 144 :: 144 % 10 = 14 r.4
 	}
@@ -45,7 +46,7 @@ public class Card
 		return suit[value % 10];
 	}
 	
-	public int rank()
+	public int getRank()
 	{
 		return value / 10; // Example: ACE OF SPADES = 144 :: 144 / 10 = 14
 	}

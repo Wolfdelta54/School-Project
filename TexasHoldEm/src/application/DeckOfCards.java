@@ -5,6 +5,7 @@ public class DeckOfCards
 	public static final int NumCards = 52; // 52 cards in a deck
 	
 	private Card[] deckOfCards;
+	int currentCard; // Top card in deck
 	
 	// Creates the deck of cards
 	public DeckOfCards()
@@ -19,6 +20,8 @@ public class DeckOfCards
 				deckOfCards[i++] = new Card(suit, rank); // Card(DIAMONDS, 1)||(ACE OF DIAMONDS), Card(DIAMONDS, 2)||(2 OF DIAMONDS) . . . Card(SPADES, 13)||(KING OF SPADES)
 			}
 		}
+		
+		currentCard = 0;
 	}
 	
 	// Shuffles the deck
@@ -36,15 +39,21 @@ public class DeckOfCards
 			deckOfCards[y] = deckOfCards[z];
 			deckOfCards[z] = shuffle;
 		}
+		
+		currentCard = 0;
 	}
-	
-	int i = 0;
 	
 	// Locates the top card in the deck
 	public Card nextCard()
 	{
-		Card topCard = deckOfCards[i];
-		i++;
+		Card topCard = deckOfCards[currentCard];
+		currentCard++;
 		return topCard;
+	}
+	
+	// Sets the index of currentCard back to the top (0)
+	public void resetCard()
+	{
+		currentCard = 0;
 	}
 }
