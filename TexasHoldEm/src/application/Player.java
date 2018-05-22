@@ -48,15 +48,23 @@ public class Player {
 				bal = bal - temp;
 				potIn = temp;
 			}
-			else {
-				betAmount.setText("Invalid Amount");
+			else if(isCurrent == false) {
 				try {
 					Thread.sleep(1500);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				betAmount.setText("");
+				betAmount.setText("0");
+			}
+			else {
+				try {
+					Thread.sleep(1500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				betAmount.setText("0");
 			}
 		}
 		else if(amount > 0) {
