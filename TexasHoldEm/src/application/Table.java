@@ -13,17 +13,17 @@ public class Table extends Application
 {
 
 	private int pot = 0; // initializes pot to 0
-	private final ArrayList<Player> players; // list of players and their attributes
+	/*private final ArrayList<Player> players; // list of players and their attributes
 	private final ArrayList<River> riverCards;
-	private final DeckOfCards deck = new DeckOfCards();
+	private final DeckOfCards deck = new DeckOfCards();*/
 	private int port = 4444;
 	
 
 	public Table()
 	{
-		players = new ArrayList<Player>();
+		/*players = new ArrayList<Player>();
 		deck.shuffle(); // shuffles deck
-
+*/
 	}
 
 	
@@ -37,9 +37,9 @@ public class Table extends Application
 	{
 		for(int i = 0; i < 2; i ++)
 		{
-			for(int j = 0; j < players.size(); j++)
+			//for(int j = 0; j < players.size(); j++)
 			{
-				players[j].addCard(deck.nextCard()); // adds a card to the player's deck
+				//players[j].addCard(deck.nextCard()); // adds a card to the player's deck
 			}
 
 		}
@@ -47,7 +47,7 @@ public class Table extends Application
 		
 		for(int i = 0; i < 5; i++)
 		{
-			river[i].addCard(deck.nextCard()); // adds 5 cards to the river
+			//river[i].addCard(deck.nextCard()); // adds 5 cards to the river
 
 			
 		}
