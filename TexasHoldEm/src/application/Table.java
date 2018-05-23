@@ -48,6 +48,8 @@ public class Table extends Application
 		for(int i = 0; i < 5; i++)
 		{
 			river[i].addCard(deck.nextCard()); // adds 5 cards to the river
+
+			
 		}
 
 	}
