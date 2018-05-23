@@ -35,7 +35,7 @@ public class Card
 			value = (10 * rank) + suit;
 	}
 	
-	public int suit()
+	public int getSuit()
 	{
 		return value % 10; // Example: ACE OF SPADES = 144 :: 144 % 10 = 14 r.4
 	}
@@ -45,7 +45,7 @@ public class Card
 		return suit[value % 10];
 	}
 	
-	public int rank()
+	public int getRank()
 	{
 		return value / 10; // Example: ACE OF SPADES = 144 :: 144 / 10 = 14
 	}
