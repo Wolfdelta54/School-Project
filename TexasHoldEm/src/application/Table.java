@@ -14,6 +14,7 @@ public class Table extends Application
 
 	private int pot = 0; // initializes pot to 0
 	private final ArrayList<Player> players; // list of players and their attributes
+	private final ArrayList<River> riverCards;
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
 	
@@ -42,13 +43,13 @@ public class Table extends Application
 			}
 
 		}
+
 		
-		/*
 		for(int i = 0; i < 5; i++)
 		{
-			
+			river[i].addCard(deck.nextCard()); // adds 5 cards to the river
 		}
-*/
+
 	}
 
 	@Override
