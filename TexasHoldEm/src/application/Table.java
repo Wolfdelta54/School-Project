@@ -16,7 +16,6 @@ public class Table extends Application
 	private final ArrayList<Player> players; // list of players and their attributes
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
-	int a = 0;
 	
 
 	public Table()
@@ -43,12 +42,13 @@ public class Table extends Application
 			}
 
 		}
-
+		
+		/*
 		for(int i = 0; i < 5; i++)
 		{
 			
 		}
-
+*/
 	}
 
 	@Override
