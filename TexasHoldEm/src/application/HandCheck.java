@@ -1,7 +1,8 @@
 package application;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class HandCheck
 {
@@ -58,7 +59,11 @@ public class HandCheck
         for(int i=0; i<availableCards.size();i++)
         {
         	if(availableCards.get(i).getRank() == 14)
-        		rankCounter.set(0, (1+rankCounter.get(i))); 
+        	{
+        		rankCounter.add(0, (1+rankCounter.get(i))); 
+        		rankCounter.remove(rankCounter.size()); 
+        	}
+        	
             rankCounter.set(availableCards.get(i).getRank() -1,(1+rankCounter.get(i))); //ex. Queen will return 12. Therefore, array at the 12th position, or index 11, goes up 1 so subtract 1
             // [0,0,0,0,0,0,0,0,0,0,0,0,0,0] 
             // [A,2,3,4,5,6,7,8,9,10,J,Q,K,A]
@@ -68,7 +73,8 @@ public class HandCheck
         }
 
         //sort cards for evaluation
-
+        Collections.sort(suitCounter);
+        Collections.sort(rankCounter);
         //hands are already sorted by rank and suit for royal and straight flush checks.
         
         //is royal flush?
@@ -89,6 +95,7 @@ public class HandCheck
         //is straight?
         if (result == null || result.length() == 0)
         {
+        	Collections.sort(rankCounter);
         	// re-sort by rank, up to this point we had sorted by rank and suit
         	// but a straight is suit independent.
         	result = straight(rankCounter);
@@ -125,7 +132,7 @@ public class HandCheck
                 rankCounter.get(0) >= 1)    //Ace
                 && (suitCounter.get(0) > 4 || suitCounter.get(1) > 4 ||
                         suitCounter.get(2) > 4 || suitCounter.get(3) > 4))
-			return "Royal Flush"; 
+			return "Royal Flush" + availableCards.get(1).getSuit(); 
 		return ""; 
 	}
 	private String royalFlush() 
@@ -187,7 +194,8 @@ public class HandCheck
 	        	// min. requirements for a straight flush have been met.
 	        	// Loop through available cards looking for 5 consecutive cards of the same suit,
 	        	// start in reverse to get the highest value straight flush
-	        	for (int i=availableCards.size()-1;i>3;i--){
+	        	for (int i=availableCards.size()-1;i>3;i--)
+	        	{
 	        		if ((availableCards.get(i).getRank()-1 == availableCards.get(i-1).getRank() && 
 	        				availableCards.get(i).getRank()-2 == availableCards.get(i-2).getRank() &&
 	        				availableCards.get(i).getRank()-3 == availableCards.get(i-3).getRank() &&
@@ -255,7 +263,7 @@ public class HandCheck
 	{
 			if((cardRanks.get(0) == cardRanks.get(1) && cardRanks.get(0) == cardRanks.get(2) && cardRanks.get(0) == cardRanks.get(3)) ||
 					(cardRanks.get(1) == cardRanks.get(2) && cardRanks.get(1) == cardRanks.get(3) && cardRanks.get(1) == cardRanks.get(4)))
-				return "Four of a Kind"; 
+				return "Four of a Kind" + availableCards.get(2).getRank(); 
 			return ""; 
 			
 	}
@@ -264,20 +272,20 @@ public class HandCheck
 	private String fullHouse(ArrayList<Integer> rankCounter)
 	{
 		String result = "";
-		int threeOfKindRank = -1;
-		int twoOfKindRank = -1;
+		int threeOfKind = -1;
+		int twoOfKind = -1;
 
 		for (int i=rankCounter.size(); i>0; i--)
 		{
-			if ((threeOfKindRank < 0) || (twoOfKindRank < 0))
+			if ((threeOfKind < 0) || (twoOfKind < 0))
 			{
 				if ((rankCounter.get(i-1) > 2))
 				{
-					threeOfKindRank = i-1;                  
+					threeOfKind = i-1;                  
 				}
 				else if ((rankCounter.get(i-1) > 1))
 				{
-					twoOfKindRank = i-1;
+					twoOfKind = i-1;
 				}
 			}
 			else
@@ -286,9 +294,9 @@ public class HandCheck
 			}
 		}
 
-		if ((threeOfKindRank >= 0) && (twoOfKindRank >= 0))
+		if ((threeOfKind >= 0) && (twoOfKind >= 0))
 		{
-			result = "Full House: ";
+			result = "Full House ";
 		}
 
 		return result;
@@ -310,7 +318,7 @@ public class HandCheck
 						availableCards.get(i).getSuit() == availableCards.get(i-3).getSuit() &&
 						availableCards.get(i).getSuit() == availableCards.get(i-4).getSuit())
 				{
-					result = "Flush!! ";
+					result = "Flush " + availableCards.get(2).getSuit();
 					break;
 				}
 			}           
@@ -360,20 +368,20 @@ public class HandCheck
 	private String evaluateTwoPair(ArrayList<Integer> rankCounter)
 	{
 		String result = "";
-		int firstPairRank = -1;
-		int secondPairRank = -1;
+		int firstPair = -1;
+		int secondPair = -1;
 
 		for (int i=rankCounter.size();i>0;i--)
 		{
-			if ((firstPairRank < 0) || (secondPairRank < 0))
+			if ((firstPair < 0) || (secondPair < 0))
 			{             
-				if (((rankCounter.get(i-1)) > 1) && (firstPairRank < 0))
+				if (((rankCounter.get(i-1)) > 1) && (firstPair < 0))
 				{
-					firstPairRank = i-1;                    
+					firstPair = i-1;                    
 				}
 				else if ((rankCounter.get(i-1)) > 1)
 				{
-					secondPairRank = i-1;
+					secondPair = i-1;
 				}
 			}
 			else
@@ -383,18 +391,18 @@ public class HandCheck
 			}
 		}
 
-		// populate output
-		if ((firstPairRank >= 0) && (secondPairRank >= 0))
+		// output
+		if ((firstPair >= 0) && (secondPair >= 0))
 		{
-			if (secondPairRank == 0)
+			if (secondPair == 0)
 			{
-				// Aces serve as top rank but are at the bottom of the rank array
+				// because the aces are the highest cards yet 
 				// swap places so aces show first as highest pair
-				result = "Two Pair: " + availableCards.get(secondPairRank).getRank() + "'s and " + availableCards.get(firstPairRank).getRank() + "'s";
+				result = "Two Pair: " + availableCards.get(secondPair).getRank() + "'s and " + availableCards.get(firstPair).getRank() + "'s";
 			}
 			else 
 			{
-				result = "Two Pair: " + availableCards.get(firstPairRank).getRank() + "'s and " + availableCards.get(secondPairRank).getRank() + "'s";
+				result = "Two Pair: " + availableCards.get(firstPair).getRank() + "'s and " + availableCards.get(secondPair).getRank() + "'s";
 			}           
 		}
 
