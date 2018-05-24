@@ -40,7 +40,7 @@ public class Card
 		return value % 10; // Example: ACE OF SPADES = 144 :: 144 % 10 = 14 r.4
 	}
 	
-	public String StrSuit()
+	public String strSuit()
 	{
 		return suit[value % 10];
 	}
@@ -50,7 +50,7 @@ public class Card
 		return value / 10; // Example: ACE OF SPADES = 144 :: 144 / 10 = 14
 	}
 	
-	public String StrRank()
+	public String strRank()
 	{
 		return rank[value / 10];
 	}
