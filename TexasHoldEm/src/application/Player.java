@@ -1,17 +1,18 @@
 package application;
 
-import javafx.scene.control.Button;
+import java.util.ArrayList;
+
 import javafx.scene.control.TextField;
 
 public class Player {
 	public int bal = 500; // Player's current balance
 	public int potIn = 0;
 	public String name = ""; // Player's username
-//	public Hand hand;
+	public Hand hand;
 	public boolean isActive = true; // Used to determine if the Player is still in the round
 	public boolean isCurrent = false; // Used to determine if the Player is the currently Active Player
 	public String betAmount = "";
-//	public ArrayList<Card> cards = new ArrayList<Card>();
+	public ArrayList<Card> cards = new ArrayList<Card>();
 	
 	public Player(String name) {
 		this.name = name;
@@ -25,9 +26,9 @@ public class Player {
 		return bal;
 	}
 	
-/*	public Hand getHand() {
+	public Hand getHand() {
 		return this.hand;
-	} */
+	} 
 	
 	public boolean getActive() {
 		return isActive;
@@ -72,13 +73,15 @@ public class Player {
 		}
 	}
 	
-/*	public void addToHand(Card card) {
+	public void addCard(Card card) {
 		cards.add(card);
 		
 		if(cards.size() == 2) {
-			hand = new Hand(cards);
+			hand = new Hand();
+			hand.addCard(cards.get(0));
+			hand.addCard(cards.get(1));
 		}
-	} */
+	} 
 	
 	public void setActive(boolean status) {
 		isActive = status;

@@ -1,32 +1,40 @@
 package application;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-
-public class Table extends Application
+public class Table /* extends Application */
 {
+	// Multiplayer variables
+	public static int portNumber = 4444;
+	
+	private int serverPort;
+	public List<ClientThread> clients;
 
 	private int pot = 0; // initializes pot to 0
-	/*private final ArrayList<Player> players; // list of players and their attributes
-	private final ArrayList<River> riverCards;
-	private final DeckOfCards deck = new DeckOfCards();*/
+	private final ArrayList<Player> players = new ArrayList<Player>(); // list of players and their attributes
+	private final ArrayList<River> riverCards = new ArrayList<River>();
+	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
 	
 
 	public Table()
 	{
-		/*players = new ArrayList<Player>();
-		deck.shuffle(); // shuffles deck
-*/
+		this.serverPort = 4444;
+		players = new ArrayList<Player>();
+	//	deck.shuffle(); // shuffles deck
+
 	}
 
-	
+	public Table(int portNumber) {
+		this.serverPort = portNumber;
+		players = new ArrayList<Player>();
+	//	deck.shuffle();
+	}
 
 	public int getPot()
 	{		
@@ -37,9 +45,9 @@ public class Table extends Application
 	{
 		for(int i = 0; i < 2; i ++)
 		{
-			//for(int j = 0; j < players.size(); j++)
+			for(int j = 0; j < players.size(); j++)
 			{
-				//players[j].addCard(deck.nextCard()); // adds a card to the player's deck
+				players.get(j).addCard(deck.nextCard()); // adds a card to the player's deck
 			}
 
 		}
@@ -47,14 +55,59 @@ public class Table extends Application
 		
 		for(int i = 0; i < 5; i++)
 		{
-			//river[i].addCard(deck.nextCard()); // adds 5 cards to the river
-
-			
+		//	river[i].addCard(deck.nextCard()); // adds 5 cards to the river	
 		}
 
 	}
+	
+	public List<ClientThread> getClients() {
+		return clients;
+	}
+	
+	public void setPort(int num) {
+		portNumber = num;
+	}
+	
+	public void startServer() {
+		clients = new ArrayList<ClientThread>();
+		
+		ServerSocket serverSocket = null;
+		
+		try {
+			serverSocket = new ServerSocket(serverPort);
+			acceptClients(serverSocket);
+		} catch (IOException ex) {
+			System.err.println("Could not listen on port: " + serverPort);
+			System.exit(1);
+		}
+	}
+	
+	public void acceptClients(ServerSocket serverSocket) {
+		String hostIP = "";
+		try {
+			InetAddress localHost = InetAddress.getLocalHost();
+			hostIP = localHost.getHostAddress();
+		} catch (UnknownHostException e) {
+			hostIP = serverSocket.getLocalSocketAddress() + "";
+		}
+		System.out.println("Server started on port = " + hostIP);
+		
+		while(true) {
+			try {
+				Socket socket = serverSocket.accept();
+				System.out.println("User: " + " has connected");
+				System.out.println("From: " + socket.getRemoteSocketAddress());
+				ClientThread client = new ClientThread(this, socket);
+				Thread thread = new Thread(client);
+				thread.start();
+				clients.add(client);
+			} catch (IOException ex) {
+				System.out.println("User: " + " has failed to connect");
+			}
+		}
+	}
 
-	@Override
+/*	@Override
 	public void start(Stage primaryStage) {
 		Button btn = new Button();
 		btn.setText("Say 'Hello World'");
@@ -75,11 +128,8 @@ public class Table extends Application
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
-
-	/**
-	 * @param args the command line arguments
-	 */
+	
 	public static void main(String[] args) {
 		launch(args);
-	}
+	} */
 }
