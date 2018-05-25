@@ -16,7 +16,7 @@ public class Table /* extends Application */
 	public List<ClientThread> clients;
 
 	private int pot = 0; // initializes pot to 0
-	private final ArrayList<Player> players = new ArrayList<Player>(); // list of players and their attributes
+	private ArrayList<Player> players = new ArrayList<Player>(); // list of players and their attributes
 	private final ArrayList<River> riverCards = new ArrayList<River>();
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
@@ -26,14 +26,14 @@ public class Table /* extends Application */
 	{
 		this.serverPort = 4444;
 		players = new ArrayList<Player>();
-	//	deck.shuffle(); // shuffles deck
+		deck.shuffle(); // shuffles deck
 
 	}
 
 	public Table(int portNumber) {
 		this.serverPort = portNumber;
 		players = new ArrayList<Player>();
-	//	deck.shuffle();
+		deck.shuffle();
 	}
 
 	public int getPot()
