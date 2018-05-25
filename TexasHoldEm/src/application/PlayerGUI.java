@@ -19,7 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-public class PlayerGUI {
+public class PlayerGUI implements Runnable {
 	// Server info storage
 	public String serverHost; // Server IP storage
 	public int serverPort; // Server port storage
@@ -289,7 +289,8 @@ public class PlayerGUI {
 		}
 	}
 	
-	public void startClient() {
+	@Override
+	public void run() {
 		try {
 			Socket socket = new Socket(serverHost, serverPort); // Creates a socket
 			Thread.sleep(1000); // Wait for network communication

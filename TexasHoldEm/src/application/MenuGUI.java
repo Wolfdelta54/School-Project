@@ -40,6 +40,7 @@ public class MenuGUI extends Application {
 	public Label userLabel = new Label("User Name:");
 	public Label title = new Label("Texas Hold'Em");
 	public Scene scene;
+	public Scene gameScene;
 	
 	// Server Join components
 	public GridPane serverPane = new GridPane();
@@ -76,7 +77,7 @@ public class MenuGUI extends Application {
         servers.setVisible(false);
         host.setVisible(false);
         
-        addListeners();
+        addListeners(primaryStage);
         addImages();
         
         // Set position of MenuOptions
@@ -102,7 +103,7 @@ public class MenuGUI extends Application {
 	}
 	
 	// Adds change listener to the UserName textfield
-	public void addListeners() {
+	public void addListeners(Stage primaryStage) {
 		user.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> arg0, String oldVal, String newVal) {
@@ -132,14 +133,22 @@ public class MenuGUI extends Application {
 			}
 			else {
 				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
-				scene = play.getScene();
+				Thread playStart = new Thread(play);
+				playStart.start();
+				gameScene = play.getScene();
+				primaryStage.setScene(gameScene);
 			}
 		});
 		
 		host.setOnAction(event -> {
-			Table table = new Table();
-			table.startServer();
+			Table table = new Table(4444);
+			Thread srvStart = new Thread(table);
+			srvStart.start();
+			
 			String ipStorage = "0.0.0.0";
+			
+			Label test = new Label("This is a test");
+			
 			try {
 				InetAddress ipAddr = InetAddress.getLocalHost();
 				ipStorage = ipAddr.getHostAddress();
@@ -148,10 +157,16 @@ public class MenuGUI extends Application {
 			}
 			
 			PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+			Thread playStart = new Thread(play);
+			playStart.start();
 			BorderPane pane = new BorderPane();
 			pane.setCenter(play.getPane());
-			pane.setBottom(table.getIpPane());
-			scene = new Scene(pane, 1000, 750);
+			pane.setTop(table.getIpPane());
+			gameScene = new Scene(pane, 1000, 750);
+			
+			Stage hostStage = new Stage();
+			hostStage.setScene(gameScene);
+			hostStage.show();
 		});
 	}
 	

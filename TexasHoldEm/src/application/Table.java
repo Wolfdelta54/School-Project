@@ -12,7 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-public class Table /* extends Application */
+public class Table implements Runnable /* extends Application */
 {
 	// Multiplayer variables
 	public static int portNumber = 4444;
@@ -34,14 +34,6 @@ public class Table /* extends Application */
 		this.serverPort = 4444;
 		players = new ArrayList<Player>();
 		deck.shuffle(); // shuffles deck
-	     
-        try {
-            InetAddress ipAddr = InetAddress.getLocalHost();
-            ip.setText(ipAddr.getHostAddress());
-            ipPane.add(ip, 0, 0);
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
-        }
 	}
 
 	public Table(int portNumber) {
@@ -102,6 +94,44 @@ public class Table /* extends Application */
 
 	}
 	
+	public void doAction(String input) {
+		String user = input.substring(0, input.indexOf(";")); // Get the username of who executed the action
+		String action = ""; // Get the action executed
+		int amount = 0; // If needed, bet amount storage
+		
+		input = input.replace(user + ";", "");
+		
+		if(input.indexOf(";") != -1) {
+			action = input.substring(0, input.indexOf(";"));
+			amount = Integer.parseInt(input.substring(input.indexOf(";") + 1));
+		}
+		else {
+			action = input.substring(input.indexOf(";") + 1);
+		}
+		
+		// Go through the list of players looking for the one who's user matches that of the executor
+		for(int i = 0; i < players.size(); i++) {
+			if(user.equals(players.get(i).getName())) {
+				// Set active to false if the action was Fold
+				if(action.equalsIgnoreCase("Fold")) {
+					players.get(i).setActive(false);
+				}
+				// Update balance of the executor and update the current bet
+				else if(action.equalsIgnoreCase("Bet") || action.equalsIgnoreCase("Raise") || action.equalsIgnoreCase("Call")) {
+					players.get(i).updateBal(-amount);
+					
+					for(int j = 0; j < players.size(); j++) {
+						players.get(j).setCurBet(amount);
+					}
+				}
+				// Do nothing
+				else if(action.equalsIgnoreCase("Check")) {
+					
+				}
+			}
+		}
+	}
+	
 	public List<ClientThread> getClients() {
 		return clients;
 	}
@@ -110,7 +140,8 @@ public class Table /* extends Application */
 		portNumber = num;
 	}
 	
-	public void startServer() {
+	@Override
+	public void run() {
 		clients = new ArrayList<ClientThread>();
 		
 		ServerSocket serverSocket = null;
@@ -129,6 +160,8 @@ public class Table /* extends Application */
 		try {
 			InetAddress localHost = InetAddress.getLocalHost();
 			hostIP = localHost.getHostAddress();
+            ip.setText("Server IP: " + localHost.getHostAddress());
+            ipPane.add(ip, 0, 0);
 		} catch (UnknownHostException e) {
 			hostIP = serverSocket.getLocalSocketAddress() + "";
 		}
