@@ -2,6 +2,8 @@ package application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javafx.application.Application;
@@ -14,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -134,7 +137,21 @@ public class MenuGUI extends Application {
 		});
 		
 		host.setOnAction(event -> {
+			Table table = new Table();
+			table.startServer();
+			String ipStorage = "0.0.0.0";
+			try {
+				InetAddress ipAddr = InetAddress.getLocalHost();
+				ipStorage = ipAddr.getHostAddress();
+			} catch (UnknownHostException ex) {
+				ex.printStackTrace();
+			}
 			
+			PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+			BorderPane pane = new BorderPane();
+			pane.setCenter(play.getPane());
+			pane.setBottom(table.getIpPane());
+			scene = new Scene(pane, 1000, 750);
 		});
 	}
 	

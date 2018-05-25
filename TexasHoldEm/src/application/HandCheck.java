@@ -61,7 +61,7 @@ public class HandCheck
         	if(availableCards.get(i).getRank() == 14)
         	{
         		rankCounter.add(0, (1+rankCounter.get(i))); 
-        		rankCounter.remove(rankCounter.size()); 
+        		rankCounter.remove(rankCounter.size() - 1); 
         	}
         	
             rankCounter.set(availableCards.get(i).getRank() -1,(1+rankCounter.get(i))); //ex. Queen will return 12. Therefore, array at the 12th position, or index 11, goes up 1 so subtract 1
@@ -81,19 +81,19 @@ public class HandCheck
         result = royalFlush1(rankCounter, suitCounter);
 
         //is straight flush?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = straightFlush(); 
         //is four of a kind?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = fourOfAKind(rankCounter);
         //is full house?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = fullHouse(rankCounter);
         //is flush?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = flush(rankCounter, suitCounter);
         //is straight?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         {
         	Collections.sort(rankCounter);
         	// re-sort by rank, up to this point we had sorted by rank and suit
@@ -101,20 +101,20 @@ public class HandCheck
         	result = straight(rankCounter);
         }
         //is three of a kind?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = evaluateThreeOfAKind(rankCounter);
 
         //is two pair?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = evaluateTwoPair(rankCounter);
 
         //is one pair?
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = evaluateOnePair(rankCounter);
 
 
         //is highest hand? 
-        if (result == null || result.length() == 0)
+        if (result.length() == 0)
         	result = evaluateHighCard(rankCounter);
         
         return result; 

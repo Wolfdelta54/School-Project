@@ -25,10 +25,8 @@ public class Table /* extends Application */
 	private final River riverCards = new River();
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
-	public Stage ipView;
 	public Label ip = new Label();
 	public GridPane ipPane = new GridPane();
-	public Scene ipScene = new Scene(ipPane, 150, 150);
 	
 
 	public Table()
@@ -41,9 +39,6 @@ public class Table /* extends Application */
             InetAddress ipAddr = InetAddress.getLocalHost();
             ip.setText(ipAddr.getHostAddress());
             ipPane.add(ip, 0, 0);
-            
-            ipView.setScene(ipScene);
-            ipView.show();
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
         }
@@ -53,6 +48,10 @@ public class Table /* extends Application */
 		this.serverPort = portNumber;
 		players = new ArrayList<Player>();
 		deck.shuffle();
+	}
+	
+	public GridPane getIpPane() {
+		return ipPane;
 	}
 	
 	public void addPlayer(Player player) {
