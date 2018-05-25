@@ -7,6 +7,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+
 public class Table /* extends Application */
 {
 	// Multiplayer variables
@@ -17,9 +22,13 @@ public class Table /* extends Application */
 
 	private int pot = 0; // initializes pot to 0
 	private ArrayList<Player> players = new ArrayList<Player>(); // list of players and their attributes
-	private final ArrayList<River> riverCards = new ArrayList<River>();
+	private final River riverCards = new River();
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
+	public Stage ipView;
+	public Label ip = new Label();
+	public GridPane ipPane = new GridPane();
+	public Scene ipScene = new Scene(ipPane, 150, 150);
 	
 
 	public Table()
@@ -27,7 +36,17 @@ public class Table /* extends Application */
 		this.serverPort = 4444;
 		players = new ArrayList<Player>();
 		deck.shuffle(); // shuffles deck
-
+	     
+        try {
+            InetAddress ipAddr = InetAddress.getLocalHost();
+            ip.setText(ipAddr.getHostAddress());
+            ipPane.add(ip, 0, 0);
+            
+            ipView.setScene(ipScene);
+            ipView.show();
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
+        }
 	}
 
 	public Table(int portNumber) {
@@ -35,10 +54,34 @@ public class Table /* extends Application */
 		players = new ArrayList<Player>();
 		deck.shuffle();
 	}
+	
+	public void addPlayer(Player player) {
+		players.add(player);
+	}
+	
+	public void removePlayer(Player player) {
+		String toRemove = player.getName();
+		
+		for(int i = 0; i < players.size(); i++) {
+			String user = players.get(i).getName();
+			
+			if(user.equals(toRemove)) {
+				players.remove(i);
+			}
+		}
+	}
 
 	public int getPot()
 	{		
 		return pot; // returns pot
+	}
+	
+	public ArrayList<Player> getPlayers() {
+		return players;
+	}
+	
+	public River getRiver() {
+		return riverCards;
 	}
 
 	public void deal()
@@ -55,7 +98,7 @@ public class Table /* extends Application */
 		
 		for(int i = 0; i < 5; i++)
 		{
-		//	river[i].addCard(deck.nextCard()); // adds 5 cards to the river	
+			riverCards.addCard(deck.nextCard()); // adds 5 cards to the river	
 		}
 
 	}

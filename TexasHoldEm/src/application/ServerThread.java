@@ -7,12 +7,11 @@ import java.util.Scanner;
 
 public class ServerThread implements Runnable 
 {
-	private Socket socket;
-	private String userName;
-	@SuppressWarnings("unused")
-	private static boolean isAlive;
-	private final LinkedList<String> actionsToSend;
-	private boolean hasMessages = false;
+	private Socket socket; // Required to connect to a server
+	private String userName; // The username of the player
+	private final LinkedList<String> actionsToSend; // Used to store the players actions
+	private boolean hasMessages = false; // Stores actionsToSend.isEmpty()
+	private Player player; // Stores a player object
 	
 	public ServerThread(Socket socket, String userName)
 	{
@@ -21,12 +20,18 @@ public class ServerThread implements Runnable
 		actionsToSend = new LinkedList<String>();
 	}
 	
+	// Send the player's actions to the server
 	public void addNextAction(String message)
 	{
 		synchronized (actionsToSend) {
 			hasMessages = true;
 			actionsToSend.push(message);
 		}
+	}
+	
+	// Send the new Player's info to the server
+	public void addPlayer(Player player) {
+		this.player = player;
 	}
 	
 	@Override
@@ -42,6 +47,10 @@ public class ServerThread implements Runnable
 			Scanner serverIn = new Scanner(serverInStream); // Creates a new scanner that will store the actions until they are sent to the server
 			// BufferedReader userBr = new BufferedReader(new InputStreamReader(userInStream);
 			// Scanner userIn = new Scanner(userInStream);
+			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream()); // used to send the new player to the server
+			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream()); // used to receive info about new players
+			
+			oos.writeObject(player);
 			
 			// A loop that runs while the player is connected to a server
 			while(!socket.isClosed())

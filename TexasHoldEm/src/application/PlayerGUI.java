@@ -67,10 +67,10 @@ public class PlayerGUI {
 	} 
 	
 	public PlayerGUI(String user, String host, int portNumber) {
-		setUser("No Name");
+		setUser(user);
 		player.setCurrent(true);
-	//	serverHost = host;
-	//	serverPort = portNumber;
+		serverHost = host;
+		serverPort = portNumber;
 		
 		addListeners();
         addImages();
