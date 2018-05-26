@@ -1,5 +1,7 @@
 package application;
 
+import java.io.File;
+
 public class Card
 {
 	public static final int DIAMONDS = 1;
@@ -53,6 +55,48 @@ public class Card
 	public String strRank()
 	{
 		return rank[value / 10];
+	}
+	
+	public String getImage(int suit, int rank) {
+		String fileName;
+		String cardRank;
+		
+		if(rank == 14) {
+			cardRank = "A";
+		}
+		else if(rank == 13) {
+			cardRank = "K";
+		}
+		else if(rank == 12) {
+			cardRank = "Q";
+		}
+		else if(rank == 11) {
+			cardRank = "J";
+		}
+		else {
+			if(rank != 0)
+				cardRank = rank + "";
+			else
+				cardRank = "";
+		}
+		
+		if(suit == 1) {
+			fileName = cardRank + "-D.png";
+		}
+		else if(suit == 2) {
+			fileName = cardRank + "-C.png";
+		}
+		else if(suit == 3) {
+			fileName = cardRank + "-H.png";
+		}
+		else if(suit == 4) {
+			fileName = cardRank + "-S.png";
+		}
+		else {
+			fileName = "card_back.png";
+		}
+		
+		return "Images/cards/" + fileName;
 	}
 	
 	public String toString()

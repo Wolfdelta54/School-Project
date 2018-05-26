@@ -38,11 +38,12 @@ public class ClientThread implements Runnable
 			// start communicating
 			while(!socket.isClosed())
 			{
+				System.out.println(socket.getInputStream().read());
 				if(in.hasNextLine())
 				{
 					String input = in.nextLine();
 					// NOTE: if you want to check server can read input, uncomment next line and check server file console
-					// System.out.println(input);
+					 System.out.println("Server: " + input);
 					for(ClientThread thatClient : table.getClients())
 					{
 						PrintWriter thatClientOut = thatClient.getWriter();
@@ -52,26 +53,11 @@ public class ClientThread implements Runnable
 							thatClientOut.flush();
 						}
 					}
+					this.table.doAction(input);
 				}
 			}
+			System.out.println("While loop as been closed");
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void getPlayer() {
-		try {
-			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream()); // used to receive info about new players
-			
-			if(ois.readObject().getClass().equals("Player")) {
-				this.player = (Player) ois.readObject();
-				System.out.println(player.getName());
-			}
-		} catch (IOException e) {
-			// Prints the error that cause the Try statement to fail
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

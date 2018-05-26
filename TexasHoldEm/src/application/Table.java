@@ -22,11 +22,13 @@ public class Table implements Runnable /* extends Application */
 
 	private int pot = 0; // initializes pot to 0
 	private ArrayList<Player> players = new ArrayList<Player>(); // list of players and their attributes
+	private ArrayList<PlayerGUI> playersGUI = new ArrayList<PlayerGUI>();
 	private final River riverCards = new River();
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
 	public Label ip = new Label();
 	public GridPane ipPane = new GridPane();
+	public Label potLbl = new Label("$0");
 	
 
 	public Table()
@@ -48,6 +50,10 @@ public class Table implements Runnable /* extends Application */
 	
 	public void addPlayer(Player player) {
 		players.add(player);
+	}
+	
+	public void addPlayerGUI(PlayerGUI playerGUI) {
+		playersGUI.add(playerGUI);
 	}
 	
 	public void removePlayer(Player player) {
@@ -91,7 +97,7 @@ public class Table implements Runnable /* extends Application */
 		{
 			riverCards.addCard(deck.nextCard()); // adds 5 cards to the river	
 		}
-
+		deck.shuffle();
 	}
 	
 	public void doAction(String input) {
@@ -119,6 +125,9 @@ public class Table implements Runnable /* extends Application */
 				// Update balance of the executor and update the current bet
 				else if(action.equalsIgnoreCase("Bet") || action.equalsIgnoreCase("Raise") || action.equalsIgnoreCase("Call")) {
 					players.get(i).updateBal(-amount);
+					pot += amount;
+					
+					potLbl.setText("$" + pot);
 					
 					for(int j = 0; j < players.size(); j++) {
 						players.get(j).setCurBet(amount);
@@ -129,7 +138,16 @@ public class Table implements Runnable /* extends Application */
 					
 				}
 			}
+			// Add player to players
+			else if(action.equalsIgnoreCase("Joined")) {
+				players.add(new Player(user));
+				System.out.println(user + " has joined, method works");
+			}
 		}
+	}
+	
+	public Label getPotLbl() {
+		return potLbl;
 	}
 	
 	public List<ClientThread> getClients() {

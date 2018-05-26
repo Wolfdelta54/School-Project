@@ -133,6 +133,7 @@ public class MenuGUI extends Application {
 			}
 			else {
 				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+				play.sendJoin();
 				Thread playStart = new Thread(play);
 				playStart.start();
 				gameScene = play.getScene();
@@ -157,16 +158,19 @@ public class MenuGUI extends Application {
 			}
 			
 			PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+			table.addPlayer(play.getPlayer());
+			table.deal();
+			play.addHand();
 			Thread playStart = new Thread(play);
 			playStart.start();
 			BorderPane pane = new BorderPane();
+			table.getPotLbl().setTranslateX(450);
+			table.getPotLbl().setTranslateY(300);
+			play.getPane().getChildren().add(table.getPotLbl());
 			pane.setCenter(play.getPane());
 			pane.setTop(table.getIpPane());
 			gameScene = new Scene(pane, 1000, 750);
-			
-			Stage hostStage = new Stage();
-			hostStage.setScene(gameScene);
-			hostStage.show();
+			primaryStage.setScene(gameScene);
 		});
 	}
 	

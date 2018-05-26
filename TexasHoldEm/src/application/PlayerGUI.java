@@ -24,7 +24,7 @@ public class PlayerGUI implements Runnable {
 	public String serverHost; // Server IP storage
 	public int serverPort; // Server port storage
 	public String userName; // Username storage
-	public String actions; // Stores the action that the player has done
+	public String actions = ""; // Stores the action that the player has done
 	
 	
 	// Game Stage GUI components
@@ -100,6 +100,15 @@ public class PlayerGUI implements Runnable {
 //        primaryStage.show();
 	}
 	
+	public void sendJoin() {
+		actions = userName + ";joined";
+		System.out.print(actions);
+	}
+	
+	public String getName() {
+		return player.getName();
+	}
+	
 	public Scene getScene() {
 		return scene;
 	}
@@ -138,7 +147,6 @@ public class PlayerGUI implements Runnable {
 					player.updateBal(-bet, betAmount);
 					player.setCurrent(false);
 					balance.setText("$" + player.getBal());
-					System.out.println(player.getBal());
 					actions = userName + ";bet;" + bet;
 					curBet = bet;
 					updateBtns();
@@ -242,6 +250,17 @@ public class PlayerGUI implements Runnable {
 		}
 	} 
 	
+	public void addHand() {
+        GridPane hand = player.getHandPane();
+        hand.setTranslateX(175);
+        hand.setTranslateY(480);
+        gameStage.getChildren().add(hand);
+        GridPane dummy = player.getDummyHand();
+        dummy.setTranslateX(350);
+        dummy.setTranslateY(480);
+        gameStage.getChildren().add(dummy);
+	}
+	
 	// Sets the currently running bet
 	public void setCurBet(int num) {
 		curBet = num;
@@ -251,6 +270,10 @@ public class PlayerGUI implements Runnable {
 	public void setUser(String user) {
 		userName = user;
 		player = new Player(userName);
+	}
+	
+	public Player getPlayer() {
+		return player;
 	}
 	
 	public void updateBtns() {
@@ -302,7 +325,7 @@ public class PlayerGUI implements Runnable {
 			// as long as the serverAccessThread is running (alive) the program will go through the loop
 			while(serverAccessThread.isAlive()) {
 				// if actions is not empty than it will send the info
-				if(!actions.trim().equals("")) {
+				if(actions != null && !actions.trim().equals("")) {
 					// sends the info
 					serverThread.addNextAction(actions);
 					// then empties the string to avoid overflow/overload

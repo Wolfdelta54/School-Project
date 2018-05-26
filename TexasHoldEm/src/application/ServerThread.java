@@ -12,6 +12,8 @@ public class ServerThread implements Runnable
 	private final LinkedList<String> actionsToSend; // Used to store the players actions
 	private boolean hasMessages = false; // Stores actionsToSend.isEmpty()
 	private Player player; // Stores a player object
+	private PlayerGUI gui;
+	private String message;
 	
 	public ServerThread(Socket socket, String userName)
 	{
@@ -26,12 +28,17 @@ public class ServerThread implements Runnable
 		synchronized (actionsToSend) {
 			hasMessages = true;
 			actionsToSend.push(message);
+			this.message = message;
 		}
 	}
 	
 	// Send the new Player's info to the server
 	public void addPlayer(Player player) {
 		this.player = player;
+	}
+	
+	public void addPlayerGUI(PlayerGUI gui) {
+		this.gui = gui;
 	}
 	
 	@Override
@@ -47,10 +54,6 @@ public class ServerThread implements Runnable
 			Scanner serverIn = new Scanner(serverInStream); // Creates a new scanner that will store the actions until they are sent to the server
 			// BufferedReader userBr = new BufferedReader(new InputStreamReader(userInStream);
 			// Scanner userIn = new Scanner(userInStream);
-			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream()); // used to send the new player to the server
-			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream()); // used to receive info about new players
-			
-			oos.writeObject(player);
 			
 			// A loop that runs while the player is connected to a server
 			while(!socket.isClosed())
