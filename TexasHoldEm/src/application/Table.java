@@ -1,4 +1,6 @@
 package application;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -7,10 +9,17 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
+import javafx.scene.layout.Pane;
 
 public class Table implements Runnable /* extends Application */
 {
@@ -28,7 +37,20 @@ public class Table implements Runnable /* extends Application */
 	private int port = 4444;
 	public Label ip = new Label();
 	public GridPane ipPane = new GridPane();
-	public Label potLbl = new Label("$0");
+	// Betting rounds are as follows: 0 - first bet, right after deal; 1 - first 3 cards of river have been shown;
+	//		2 - first 4 cards of river have been shown; 3 - first 5 cards of river have been shown
+	// After round 3 of betting the hands of all currently active players are shown and they go though the hand checker
+	// Player with the best hand gets the pot then the next hand is dealt and betting commences again
+	public int curRnd = 0;
+	public final int maxRnds = 3;
+	public int highBet = 0; // Stores the highest bet, used to see if all players have bet this amount or have gone all in
+	
+	// Pane of components that will constantly change
+	public Group tablePane = new Group();
+	public GridPane riverPane = new GridPane();
+	public ArrayList<ImageView> riverImgs = new ArrayList<ImageView>(); // Stores the images for the river
+	public ArrayList<GridPane> handList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold the images of every player's cards
+	public ArrayList<GridPane> playerList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold all of the info for each player
 	
 
 	public Table()
@@ -48,8 +70,21 @@ public class Table implements Runnable /* extends Application */
 		return ipPane;
 	}
 	
+	public Group getPane() {
+		return tablePane;
+	}
+	
+	public GridPane getRiverPane() {
+		return riverPane;
+	}
+	
+	public void setRiverPane() {
+		riverPane = riverCards.getPane();
+	}
+	
 	public void addPlayer(Player player) {
 		players.add(player);
+		handList.add(player.getHandPane());
 	}
 	
 	public void addPlayerGUI(PlayerGUI playerGUI) {
@@ -127,10 +162,9 @@ public class Table implements Runnable /* extends Application */
 					players.get(i).updateBal(-amount);
 					pot += amount;
 					
-					potLbl.setText("$" + pot);
-					
 					for(int j = 0; j < players.size(); j++) {
 						players.get(j).setCurBet(amount);
+						players.get(j).setPot(pot);
 					}
 				}
 				// Do nothing
@@ -144,10 +178,6 @@ public class Table implements Runnable /* extends Application */
 				System.out.println(user + " has joined, method works");
 			}
 		}
-	}
-	
-	public Label getPotLbl() {
-		return potLbl;
 	}
 	
 	public List<ClientThread> getClients() {

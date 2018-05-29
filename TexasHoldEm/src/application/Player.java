@@ -25,6 +25,7 @@ public class Player {
 	public GridPane dummyHand = new GridPane(); // Easy GUI storage for hidden cards
 	public ImageView dummy1 = new ImageView();
 	public ImageView dummy2 = new ImageView();
+	public int pot = 0;
 	
 	public Player(String name) {
 		this.name = name;
@@ -32,6 +33,10 @@ public class Player {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public int getCurPot() {
+		return pot;
 	}
 	
 	public int getBal() {
@@ -60,6 +65,10 @@ public class Player {
 	
 	public void setCurBet(int amount) {
 		curBet = amount;
+	}
+	
+	public void setPot(int newPot) {
+		potIn = newPot;
 	}
 	
 	public GridPane getHandPane() {

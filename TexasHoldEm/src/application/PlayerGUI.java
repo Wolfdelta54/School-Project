@@ -38,6 +38,8 @@ public class PlayerGUI implements Runnable {
 	public TextField betAmount = new TextField("0"); // Used for betting/raising
 	public Button stand = new Button("Stand Up"), leave = new Button("Leave Server"); // Buttons for game exiting
 	public Pane spring = new Pane(); // Used to create an empty column
+	public Label potLbl = new Label();
+	public int potVal = 0;
 	
 	public Player player; // Player object
 	public int curBet = 0; // Gets the current bet amount
@@ -58,6 +60,11 @@ public class PlayerGUI implements Runnable {
         // Set GameActions position
         gameActions.setTranslateX(75);
         gameActions.setTranslateY(625);
+        
+        // Add the pot to the GUI
+		potLbl.setTranslateX(450);
+		potLbl.setTranslateY(300);
+		gameStage.getChildren().add(potLbl);
         
         // Add background and game actions to main pane
         gameStage.getChildren().add(tableImage);
@@ -256,8 +263,8 @@ public class PlayerGUI implements Runnable {
         hand.setTranslateY(480);
         gameStage.getChildren().add(hand);
         GridPane dummy = player.getDummyHand();
-        dummy.setTranslateX(350);
-        dummy.setTranslateY(480);
+        dummy.setTranslateX(850);
+        dummy.setTranslateY(225);
         gameStage.getChildren().add(dummy);
 	}
 	
@@ -274,6 +281,11 @@ public class PlayerGUI implements Runnable {
 	
 	public Player getPlayer() {
 		return player;
+	}
+	
+	public void updatePot() {
+		potVal = player.getCurPot();
+		potLbl.setText("$" + potVal);
 	}
 	
 	public void updateBtns() {

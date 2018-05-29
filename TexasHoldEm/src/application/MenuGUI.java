@@ -164,9 +164,9 @@ public class MenuGUI extends Application {
 			Thread playStart = new Thread(play);
 			playStart.start();
 			BorderPane pane = new BorderPane();
-			table.getPotLbl().setTranslateX(450);
-			table.getPotLbl().setTranslateY(300);
-			play.getPane().getChildren().add(table.getPotLbl());
+		//	table.getPotLbl().setTranslateX(450);
+		//	table.getPotLbl().setTranslateY(300);
+		//	play.getPane().getChildren().add(table.getPotLbl());
 			pane.setCenter(play.getPane());
 			pane.setTop(table.getIpPane());
 			gameScene = new Scene(pane, 1000, 750);
