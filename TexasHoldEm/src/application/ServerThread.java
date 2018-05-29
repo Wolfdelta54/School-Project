@@ -13,7 +13,8 @@ public class ServerThread implements Runnable
 	private boolean hasMessages = false; // Stores actionsToSend.isEmpty()
 	private Player player; // Stores a player object
 	private PlayerGUI gui;
-	private String message;
+	private String message = "";
+	private boolean notSent = true;
 	
 	public ServerThread(Socket socket, String userName)
 	{
@@ -48,7 +49,7 @@ public class ServerThread implements Runnable
 		System.out.println("Server = " + socket.getRemoteSocketAddress());
 		
 		try {
-			PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), false); // Creates a new printwriter from the socket's output stream
+			OutputStreamWriter serverOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8"); // Creates a new printwriter from the socket's output stream
 			InputStream serverInStream = socket.getInputStream(); // Creates a new input stream to send action messages to the server
 			@SuppressWarnings("resource")
 			Scanner serverIn = new Scanner(serverInStream); // Creates a new scanner that will store the actions until they are sent to the server
@@ -72,11 +73,12 @@ public class ServerThread implements Runnable
 					
 					synchronized(actionsToSend) {
 						// determines if the player as done anything
-						nextSend = actionsToSend.pop();
-						hasMessages = !actionsToSend.isEmpty();
+						 nextSend = actionsToSend.pop();
+						 hasMessages = !actionsToSend.isEmpty();
+						 System.out.println(nextSend);
 					}
 					// Prints the other players' actions to the client's terminal
-					serverOut.println(userName + " > " + nextSend);
+					serverOut.write(nextSend + "\n");
 					serverOut.flush();
 				}
 			}

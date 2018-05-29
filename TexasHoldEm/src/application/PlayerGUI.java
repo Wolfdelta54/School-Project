@@ -1,13 +1,16 @@
 package application;
 
+import java.awt.Dimension;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
 
-import javafx.application.Application;
+import javax.swing.JLabel;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingNode;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,14 +20,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import javafx.scene.text.Font;
 
 public class PlayerGUI implements Runnable {
 	// Server info storage
 	public String serverHost; // Server IP storage
 	public int serverPort; // Server port storage
 	public String userName; // Username storage
-	public String actions = ""; // Stores the action that the player has done
+	public String actions = "none"; // Stores the action that the player has done
 	
 	
 	// Game Stage GUI components
@@ -38,8 +41,11 @@ public class PlayerGUI implements Runnable {
 	public TextField betAmount = new TextField("0"); // Used for betting/raising
 	public Button stand = new Button("Stand Up"), leave = new Button("Leave Server"); // Buttons for game exiting
 	public Pane spring = new Pane(); // Used to create an empty column
-	public Label potLbl = new Label();
+	public SwingNode sNode = new SwingNode();
+	public JLabel potLbl = new JLabel("$");
 	public int potVal = 0;
+	
+	public boolean wasSent = false;
 	
 	public Player player; // Player object
 	public int curBet = 0; // Gets the current bet amount
@@ -56,19 +62,21 @@ public class PlayerGUI implements Runnable {
 		addListeners();
         addImages();
         setUpBtns();
+        potAutoUpdate();
         
         // Set GameActions position
         gameActions.setTranslateX(75);
         gameActions.setTranslateY(625);
         
-        // Add the pot to the GUI
-		potLbl.setTranslateX(450);
-		potLbl.setTranslateY(300);
-		gameStage.getChildren().add(potLbl);
+        // Add potLbl to the GUI
+    		sNode.setTranslateX(450);
+    		sNode.setTranslateY(300);
+    		sNode.setContent(potLbl);
         
         // Add background and game actions to main pane
         gameStage.getChildren().add(tableImage);
         gameStage.getChildren().add(gameActions);
+		gameStage.getChildren().add(sNode);
         
         scene = new Scene(gameStage, 1000, 700);
 	} 
@@ -90,6 +98,12 @@ public class PlayerGUI implements Runnable {
         gameActions.setTranslateX(75);
         gameActions.setTranslateY(600);
         
+        // Add potLbl to the GUI
+        potLbl.setMinimumSize(new Dimension(75, 25));
+		sNode.setTranslateX(450);
+		sNode.setTranslateY(300);
+		sNode.setContent(potLbl);
+        
         // Set the size of the gaps between each row and column
         gameActions.setHgap(12);
         gameActions.setVgap(12);
@@ -98,6 +112,7 @@ public class PlayerGUI implements Runnable {
         gameStage.getChildren().add(bgImage);
         gameStage.getChildren().add(tableImage);
         gameStage.getChildren().add(gameActions);
+		gameStage.getChildren().add(sNode);
         
         scene = new Scene(gameStage, 1000, 700);
         scene.getStylesheets().add("application/PlayerGUI.css");
@@ -109,7 +124,7 @@ public class PlayerGUI implements Runnable {
 	
 	public void sendJoin() {
 		actions = userName + ";joined";
-		System.out.print(actions);
+		System.out.println(actions + "\n");
 	}
 	
 	public String getName() {
@@ -124,8 +139,22 @@ public class PlayerGUI implements Runnable {
 		return gameStage;
 	}
 	
+	public void potAutoUpdate() {
+		String potTxt = potLbl.getText();
+		String temp = "$" + potVal;
+		
+		if(!potTxt.equals(temp)) {
+			potLbl.setText(temp);
+		}
+	}
+	
 	// Adds change listener to the bet textfield and mouse listeners onto the buttons
 	public void addListeners() {
+		Label errMsg = new Label("Invalid bet amount");
+		errMsg.setTranslateX(450);
+		errMsg.setTranslateY(500);
+		errMsg.setFont(new Font("Courier", 24));
+		
 		betAmount.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> arg0, String oldVal, String newVal) {
@@ -151,12 +180,21 @@ public class PlayerGUI implements Runnable {
 			if(player.getCurrent() == true) {
 				if(!betAmount.getText().trim().equals("") && betAmount.getText() != null && !betAmount.getText().trim().equals("0")) {
 					int bet = Integer.parseInt(betAmount.getText());
-					player.updateBal(-bet, betAmount);
-					player.setCurrent(false);
-					balance.setText("$" + player.getBal());
-					actions = userName + ";bet;" + bet;
-					curBet = bet;
-					updateBtns();
+					if(bet < player.getBal()) {
+						if(gameStage.getChildren().contains(errMsg)) {
+							gameStage.getChildren().remove(errMsg);
+						}
+						player.updateBal(-bet, betAmount);
+						player.setCurrent(false);
+						balance.setText("$" + player.getBal());
+						actions = userName + ";bet;" + bet;
+						curBet = bet;
+						updateBtns();
+						System.out.println(player + " PlayerGUI");
+					}
+					else {
+						gameStage.getChildren().add(errMsg);
+					}
 				}
 			}
 		});
@@ -167,12 +205,17 @@ public class PlayerGUI implements Runnable {
 				if(!betAmount.getText().trim().equals("") && betAmount.getText() != null && !betAmount.getText().trim().equals("0")) {
 					int raise = Integer.parseInt(betAmount.getText());
 					int bet = curBet + raise;
-					player.updateBal(-bet, betAmount);
-					player.setCurrent(false);
-					balance.setText("$" + player.getBal());
-					actions = userName + ";raise;" + bet;
-					curBet = bet;
-					updateBtns();
+					if(bet < player.getBal()) {
+						player.updateBal(-bet, betAmount);
+						player.setCurrent(false);
+						balance.setText("$" + player.getBal());
+						actions = userName + ";raise;" + bet;
+						curBet = bet;
+						updateBtns();
+					}
+					else {
+						gameStage.getChildren().add(errMsg);
+					}
 				}
 			}
 		});
@@ -180,11 +223,16 @@ public class PlayerGUI implements Runnable {
 		call.setOnAction(event -> {
 			// Matches the currently running bet
 			if(player.getCurrent() == true) {
-				player.updateBal(-curBet, betAmount);
-				player.setCurrent(false);
-				balance.setText("$" + player.getBal());
-				actions = userName + ";call;" + curBet;
-				updateBtns();
+				if(curBet < player.getBal()) {
+					player.updateBal(-curBet, betAmount);
+					player.setCurrent(false);
+					balance.setText("$" + player.getBal());
+					actions = userName + ";call;" + curBet;
+					updateBtns();
+				}
+				else {
+					gameStage.getChildren().add(errMsg);
+				}
 			}
 		});
 		
@@ -209,7 +257,6 @@ public class PlayerGUI implements Runnable {
 			tableImage.setImage(new Image(timg));
 			bgImage.setImage(new Image(bgimg));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -276,6 +323,7 @@ public class PlayerGUI implements Runnable {
 	// Sets the username and instantiates the player object
 	public void setUser(String user) {
 		userName = user;
+		System.out.println(user);
 		player = new Player(userName);
 	}
 	
@@ -284,8 +332,10 @@ public class PlayerGUI implements Runnable {
 	}
 	
 	public void updatePot() {
-		potVal = player.getCurPot();
-		potLbl.setText("$" + potVal);
+		if(potVal != player.getCurPot()) {
+			potVal = player.getCurPot();
+			potLbl.setText("$" + potVal);
+		}
 	}
 	
 	public void updateBtns() {
@@ -333,16 +383,21 @@ public class PlayerGUI implements Runnable {
 			ServerThread serverThread = new ServerThread(socket, userName); // Creates the serverThread
 			Thread serverAccessThread = new Thread(serverThread); // Creates a new thread out of the serverThread
 			serverAccessThread.start(); // Starts the thread which allows multiplayer connectivity
-			serverThread.addPlayer(player);
+			
+			if(wasSent == false) {
+				serverThread.addPlayer(player);
+				wasSent = true;
+			}
 			// as long as the serverAccessThread is running (alive) the program will go through the loop
 			while(serverAccessThread.isAlive()) {
 				// if actions is not empty than it will send the info
-				if(actions != null && !actions.trim().equals("")) {
+				if(!actions.equalsIgnoreCase("none")) {
 					// sends the info
 					serverThread.addNextAction(actions);
 					// then empties the string to avoid overflow/overload
-					actions = "";
+					actions = "none";
 				}
+				updatePot();
 			}
 		} catch (IOException ex) {
 			// Catches an error that is caused by an unavailable host

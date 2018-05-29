@@ -68,7 +68,8 @@ public class Player {
 	}
 	
 	public void setPot(int newPot) {
-		potIn = newPot;
+		pot = newPot;
+		System.out.println("Current pot (Player) " + pot);
 	}
 	
 	public GridPane getHandPane() {

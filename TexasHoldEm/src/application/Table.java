@@ -84,11 +84,6 @@ public class Table implements Runnable /* extends Application */
 	
 	public void addPlayer(Player player) {
 		players.add(player);
-		handList.add(player.getHandPane());
-	}
-	
-	public void addPlayerGUI(PlayerGUI playerGUI) {
-		playersGUI.add(playerGUI);
 	}
 	
 	public void removePlayer(Player player) {
@@ -136,12 +131,14 @@ public class Table implements Runnable /* extends Application */
 	}
 	
 	public void doAction(String input) {
+	//	input = input.replace("\n", "");
+		
 		String user = input.substring(0, input.indexOf(";")); // Get the username of who executed the action
 		String action = ""; // Get the action executed
 		int amount = 0; // If needed, bet amount storage
 		
-		input = input.replace(user + ";", "");
 		
+		input = input.replace(user + ";", "");
 		if(input.indexOf(";") != -1) {
 			action = input.substring(0, input.indexOf(";"));
 			amount = Integer.parseInt(input.substring(input.indexOf(";") + 1));
@@ -150,7 +147,7 @@ public class Table implements Runnable /* extends Application */
 			action = input.substring(input.indexOf(";") + 1);
 		}
 		
-		// Go through the list of players looking for the one who's user matches that of the executor
+		// Go through the list of players looking for the one who's username matches that of the executor
 		for(int i = 0; i < players.size(); i++) {
 			if(user.equals(players.get(i).getName())) {
 				// Set active to false if the action was Fold
@@ -165,17 +162,15 @@ public class Table implements Runnable /* extends Application */
 					for(int j = 0; j < players.size(); j++) {
 						players.get(j).setCurBet(amount);
 						players.get(j).setPot(pot);
+						System.out.println("Current Pot (Table) " + pot);
+						System.out.println("Current Bet (Table) " + amount);
 					}
+					System.out.println(players.get(i) + " Table");
 				}
 				// Do nothing
 				else if(action.equalsIgnoreCase("Check")) {
-					
+					System.out.println("Checking is basically doing nothing");
 				}
-			}
-			// Add player to players
-			else if(action.equalsIgnoreCase("Joined")) {
-				players.add(new Player(user));
-				System.out.println(user + " has joined, method works");
 			}
 		}
 	}

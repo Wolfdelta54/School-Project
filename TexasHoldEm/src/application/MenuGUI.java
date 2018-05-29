@@ -4,11 +4,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,8 +19,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class MenuGUI extends Application {
 	// Network scanner, scans for available hosts
@@ -96,6 +97,14 @@ public class MenuGUI extends Application {
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+        	@Override
+        	public void handle(WindowEvent e) {
+        		Platform.exit();
+        		System.exit(0);
+        	}
+        });
 	}
 	
 	public static void main(String[] args) {
@@ -148,8 +157,6 @@ public class MenuGUI extends Application {
 			
 			String ipStorage = "0.0.0.0";
 			
-			Label test = new Label("This is a test");
-			
 			try {
 				InetAddress ipAddr = InetAddress.getLocalHost();
 				ipStorage = ipAddr.getHostAddress();
@@ -161,6 +168,7 @@ public class MenuGUI extends Application {
 			table.addPlayer(play.getPlayer());
 			table.deal();
 			play.addHand();
+			play.sendJoin();
 			Thread playStart = new Thread(play);
 			playStart.start();
 			BorderPane pane = new BorderPane();
