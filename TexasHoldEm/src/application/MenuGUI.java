@@ -196,20 +196,25 @@ public class MenuGUI extends Application {
 				if(table.isLive() == false) {
 					Scene wait = new Scene(clWaitPane, 300, 250);
 					primaryStage.setScene(wait);
-					while(table.isLive() == false) {
-						// do nothing
-					}
+					Thread waitThread = new Thread(new Runnable() {
+						public void run() {
+							while(table.isLive() == false) {
+								// do nothing
+							}
+							play.addHand();
+				
+							GridPane river = table.getRiverPane();
+							river.setTranslateX(312);
+							river.setTranslateY(180);
+				
+							play.getPane().getChildren().add(river);
+				
+							gameScene = play.getScene();
+							primaryStage.setScene(gameScene);
+						}
+					});
+					waitThread.start();
 				}
-				play.addHand();
-				
-				GridPane river = table.getRiverPane();
-				river.setTranslateX(312);
-				river.setTranslateY(180);
-				
-				play.getPane().getChildren().add(river);
-				
-				gameScene = play.getScene();
-				primaryStage.setScene(gameScene);
 			}
 		});
 		
