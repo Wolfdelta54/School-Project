@@ -209,10 +209,10 @@ public class MenuGUI extends Application {
 						@Override
 						public void changed(final ObservableValue<? extends Number> observable, final Number oldVal, final Number newVal) {
 							if(count.getAndSet(newVal.intValue()) == -1) {
+								if(play.isLive() == true) {
 								Platform.runLater(new Runnable() {
 									@Override
 									public void run() {
-										if(play.srvrLive == true) {
 											System.out.println("Hello");
 											count.set(0);
 											play.addHand();
@@ -226,12 +226,12 @@ public class MenuGUI extends Application {
 											gameScene = play.getScene();
 											primaryStage.setScene(gameScene);
 										}
-										else {
-											System.out.println("Goodbye");
-											int val = count.getAndSet(-1);
-										}
-									}
-								});
+									});
+								}
+								else {
+									System.out.println("Goodbye");
+									int val = count.getAndSet(-1);
+								}
 							}
 						}
 					});
