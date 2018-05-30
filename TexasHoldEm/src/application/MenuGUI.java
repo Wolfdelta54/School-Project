@@ -199,10 +199,10 @@ public class MenuGUI extends Application {
 					primaryStage.setScene(wait);
 					Thread waitThread = new Thread(new Runnable() {
 						public void run() {
-							while(table.isLive() == false) {
+							while(play.isLive() == false) {
 								// do nothing
 							}
-							if(table.isLive() == true) {
+							if(play.isLive() == true) {
 								play.addHand();
 				
 								GridPane river = table.getRiverPane();

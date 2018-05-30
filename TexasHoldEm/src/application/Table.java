@@ -202,6 +202,12 @@ public class Table implements Runnable /* extends Application */
 		}
 	}
 	
+	public void sendStatus() {
+		for(int i = 0; i < players.size(); i++) {
+			players.get(i).setLive(srvrLive);
+		}
+	}
+	
 	public void checkRndEnd() {
 		
 		while(hasMatched.size() < players.size()) {

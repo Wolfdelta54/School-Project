@@ -36,12 +36,22 @@ public class Player {
 	public int pot = 0;
 	public int rndBet = 0;
 	
+	public boolean srvrLive = false;
+	
 	public Player(String name) {
 		this.name = name;
 	}
 	
 	public String getName() {
 		return name;
+	}
+	
+	public boolean isLive() {
+		return srvrLive;
+	}
+	
+	public void setLive(boolean newStatus) {
+		srvrLive = newStatus;
 	}
 	
 	public int getCurPot() {
