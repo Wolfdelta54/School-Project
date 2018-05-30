@@ -98,6 +98,7 @@ public class Table implements Runnable /* extends Application */
 	
 	public void addPlayer(Player player) {
 		players.add(player);
+		System.out.println(player);
 	}
 	
 	public void removePlayer(Player player) {
@@ -199,6 +200,12 @@ public class Table implements Runnable /* extends Application */
 		if(!names.contains(user)) {
 			addPlayer(new Player(user));
 			System.out.println(players.size());
+		}
+	}
+	
+	public void prntPlayers() {
+		for(int i = 0; i < players.size(); i++) {
+			System.out.println(players.get(i));
 		}
 	}
 	

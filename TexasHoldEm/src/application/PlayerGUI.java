@@ -316,6 +316,10 @@ public class PlayerGUI implements Runnable {
 		}
 	}
 	
+	public void prntPlayer() {
+		System.out.println(player);
+	}
+	
 	// Adds the buttons to the pane
 	// If there is no current bet than the Check and Bet buttons are present
 	// If there is a current bet than the Call and Raise buttons are present

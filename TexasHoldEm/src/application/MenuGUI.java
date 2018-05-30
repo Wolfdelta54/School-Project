@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.swing.JLabel;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -157,6 +159,12 @@ public class MenuGUI extends Application {
 		launch(args);
 	}
 	
+	public void checkStatus(PlayerGUI playGUI) {
+		if(playGUI.isLive() == false) {
+			checkStatus(playGUI);
+		}
+	}
+	
 	// Adds change listener to the UserName textfield
 	public void addListeners(Stage primaryStage) {
 		user.textProperty().addListener(new ChangeListener<String>() {
@@ -193,11 +201,13 @@ public class MenuGUI extends Application {
 				
 				Thread playStart = new Thread(play);
 				playStart.start();
+				JLabel status = new JLabel();
+				status.setText(play.isLive() + "");
 				
 				if(table.isLive() == false) {
 					Scene wait = new Scene(clWaitPane, 300, 250);
 					primaryStage.setScene(wait);
-					Thread waitThread = new Thread(new Runnable() {
+			/*		Thread waitThread = new Thread(new Runnable() {
 						public void run() {
 							while(play.isLive() == false) {
 								// do nothing
@@ -216,8 +226,19 @@ public class MenuGUI extends Application {
 							}
 						}
 					});
-					waitThread.start();
+					waitThread.start(); */
+					checkStatus(play);
 				}
+				play.addHand();
+				
+				GridPane river = table.getRiverPane();
+				river.setTranslateX(312);
+				river.setTranslateY(180);
+
+				play.getPane().getChildren().add(river);
+
+				gameScene = play.getScene();
+				primaryStage.setScene(gameScene);				
 			}
 		});
 		
@@ -236,6 +257,8 @@ public class MenuGUI extends Application {
 		
 			play = new PlayerGUI(user.getText(), ipStorage, 4444);
 			table.addPlayer(play.getPlayer());
+			table.prntPlayers();
+			play.prntPlayer();
 			play.sendJoin();
 			
 			Thread playStart = new Thread(play);
@@ -305,6 +328,8 @@ public class MenuGUI extends Application {
 				playStart.start(); */
 				table.deal();
 				play.addHand();
+				table.prntPlayers();
+				play.prntPlayer();
 				
 				GridPane river = table.getRiverPane();
 				river.setTranslateX(312);

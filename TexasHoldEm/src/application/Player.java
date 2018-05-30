@@ -40,6 +40,7 @@ public class Player {
 	
 	public Player(String name) {
 		this.name = name;
+		System.out.println(this);
 	}
 	
 	public String getName() {
