@@ -213,6 +213,7 @@ public class MenuGUI extends Application {
 									@Override
 									public void run() {
 										if(play.srvrLive == true) {
+											System.out.println("Hello");
 											count.set(0);
 											play.addHand();
 											
@@ -226,6 +227,7 @@ public class MenuGUI extends Application {
 											primaryStage.setScene(gameScene);
 										}
 										else {
+											System.out.println("Goodbye");
 											int val = count.getAndSet(-1);
 										}
 									}
