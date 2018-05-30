@@ -208,6 +208,7 @@ public class MenuGUI extends Application {
 					play.srvrLiveProperty.addListener(new ChangeListener<Number>() {
 						@Override
 						public void changed(final ObservableValue<? extends Number> observable, final Number oldVal, final Number newVal) {
+							System.out.println("srvrLive has changed, MenuGUI");
 							if(count.getAndSet(newVal.intValue()) == -1) {
 								if(play.isLive() == true) {
 								Platform.runLater(new Runnable() {

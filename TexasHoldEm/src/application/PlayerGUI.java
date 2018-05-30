@@ -80,6 +80,7 @@ public class PlayerGUI implements Runnable {
     		sNode.setTranslateX(450);
     		sNode.setTranslateY(300);
     		sNode.setContent(potLbl);
+			updateVars();
         
         // Add background and game actions to main pane
         gameStage.getChildren().add(tableImage);
@@ -111,6 +112,7 @@ public class PlayerGUI implements Runnable {
 		sNode.setTranslateX(450);
 		sNode.setTranslateY(300);
 		sNode.setContent(potLbl);
+		updateVars();
         
         // Set the size of the gaps between each row and column
         gameActions.setHgap(12);
@@ -413,18 +415,28 @@ public class PlayerGUI implements Runnable {
 			balance.setText("$" + bal);
 		}
 		
-		int srvrLiveAsInt = 0;
-		if(srvrLive == true) {
-			srvrLiveAsInt = 1;
-		}
-		else {
-			srvrLiveAsInt = 0;
-			srvrLiveProperty.set(0);
-		}
-		
-		if(srvrLiveProperty.get() != srvrLiveAsInt) {
-			srvrLiveProperty.set(srvrLiveAsInt);
-		}
+		Thread srvrChange = new Thread(new Runnable() {
+			public void run() {
+				int stop = 0;
+				while(stop == 0) {
+					if(srvrLive == true) {
+						srvrLiveProperty.set(1);
+						System.out.println("srvrLive has changed, PlayerGUI");
+						stop = 1;
+					}
+					else {
+						srvrLiveProperty.set(0);
+					}
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		srvrChange.start();
 	}
 	
 	public void updateBtns() {
@@ -487,7 +499,6 @@ public class PlayerGUI implements Runnable {
 					// then empties the string to avoid overflow/overload
 					actions = "none";
 				}
-				updateVars();
 			}
 		} catch (IOException ex) {
 			// Catches an error that is caused by an unavailable host
