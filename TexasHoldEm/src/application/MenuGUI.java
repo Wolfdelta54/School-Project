@@ -193,10 +193,10 @@ public class MenuGUI extends Application {
 				Thread playStart = new Thread(play);
 				playStart.start();
 				
-				if(srvrLive == false) {
+				if(table.isLive() == false) {
 					Scene wait = new Scene(clWaitPane, 300, 250);
 					primaryStage.setScene(wait);
-					while(srvrLive == false) {
+					while(table.isLive() == false) {
 						// do nothing
 					}
 				}
@@ -271,7 +271,7 @@ public class MenuGUI extends Application {
 		
 		start.setOnAction(event -> {
 			if(table.getNumPlayers() > 1) {
-				srvrLive = true;
+				table.setLive(true);
 			
 		/*		String ipStorage = "0.0.0.0";
 			

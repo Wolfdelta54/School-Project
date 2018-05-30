@@ -48,6 +48,8 @@ public class Table implements Runnable /* extends Application */
 	public ArrayList<GridPane> handList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold the images of every player's cards
 	public ArrayList<GridPane> playerList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold all of the info for each player
 	
+	public boolean srvrLive = false;
+	
 
 	public Table()
 	{
@@ -60,6 +62,14 @@ public class Table implements Runnable /* extends Application */
 		this.serverPort = portNumber;
 		players = new ArrayList<Player>();
 		deck.shuffle();
+	}
+	
+	public boolean isLive() {
+		return srvrLive;
+	}
+	
+	public void setLive(boolean x) {
+		srvrLive = x;
 	}
 	
 	public GridPane getIpPane() {
