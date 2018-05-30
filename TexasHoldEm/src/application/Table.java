@@ -66,6 +66,10 @@ public class Table implements Runnable /* extends Application */
 		return ipPane;
 	}
 	
+	public Label getIP() {
+		return ip;
+	}
+	
 	public Group getPlayerPane() {
 		return tablePane;
 	}
