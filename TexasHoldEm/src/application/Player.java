@@ -1,12 +1,15 @@
 package application;
 
+import java.awt.Image;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+
+import javafx.embed.swing.SwingNode;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
 public class Player {
@@ -21,11 +24,15 @@ public class Player {
 	public ArrayList<Card> cards = new ArrayList<Card>();
 	public int curBet = 0;
 	public GridPane handImgs = new GridPane(); // Easy GUI storage for cards in the hand
-	public ImageView card1 = new ImageView();
-	public ImageView card2 = new ImageView();
+	public SwingNode card1Node = new SwingNode();
+	public SwingNode card2Node = new SwingNode();
+	public ImageIcon card1;
+	public ImageIcon card2;
 	public GridPane dummyHand = new GridPane(); // Easy GUI storage for hidden cards
-	public ImageView dummy1 = new ImageView();
-	public ImageView dummy2 = new ImageView();
+	public SwingNode dummy1Node = new SwingNode();
+	public SwingNode dummy2Node = new SwingNode();
+	public ImageIcon dummy1;
+	public ImageIcon dummy2;
 	public int pot = 0;
 	public int rndBet = 0;
 	
@@ -103,10 +110,27 @@ public class Player {
 	}
 	
 	public GridPane getHandPane() {
-		FileInputStream img1;
-		FileInputStream img2;
-		try {
-			img1 = new FileInputStream(cards.get(0).getImage(cards.get(0).getSuit(), cards.get(0).getRank()));
+	//	FileInputStream img1;
+	//	FileInputStream img2;
+	//	try {
+		
+			card1 = new ImageIcon(cards.get(0).getImage(cards.get(0).getSuit(), cards.get(0).getRank()));
+			card2 = new ImageIcon(cards.get(1).getImage(cards.get(1).getSuit(), cards.get(1).getRank()));
+			
+			Image card1Img = card1.getImage();
+			Image card1ImgFin = card1Img.getScaledInstance(75, 109, Image.SCALE_SMOOTH);
+			card1.setImage(card1ImgFin);
+			
+			Image card2Img = card2.getImage();
+			Image card2ImgFin = card2Img.getScaledInstance(75, 109, Image.SCALE_SMOOTH);
+			card2.setImage(card2ImgFin);
+			
+			JLabel card1Lbl = new JLabel(card1);
+			JLabel card2Lbl = new JLabel(card2);
+			
+			card1Node.setContent(card1Lbl);
+			card2Node.setContent(card2Lbl);
+		/*	img1 = new FileInputStream(cards.get(0).getImage(cards.get(0).getSuit(), cards.get(0).getRank()));
 			img2 = new FileInputStream(cards.get(1).getImage(cards.get(1).getSuit(), cards.get(1).getRank()));
 			card1.setImage(new Image(img1));
 			card2.setImage(new Image(img2));
@@ -119,23 +143,39 @@ public class Player {
 			card2.setFitWidth(75);
 			card2.setPreserveRatio(true);
 			card2.setSmooth(true);
-			card2.setCache(true);
+			card2.setCache(true); */
 		
-			handImgs.add(card1, 0, 0);
-			handImgs.add(card2, 1, 0);
-		} catch (FileNotFoundException e) {
+			handImgs.add(card1Node, 0, 0);
+			handImgs.add(card2Node, 1, 0);
+	//	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	//		e.printStackTrace();
+	//	}
 		
 		return handImgs;
 	}
 	
 	public GridPane getDummyHand() {
-		FileInputStream img1;
-		FileInputStream img2;
-		try {
-			img1 = new FileInputStream(cards.get(0).getImage(0, 0));
+	//	FileInputStream img1;
+	//	FileInputStream img2;
+	//	try {
+		dummy1 = new ImageIcon(cards.get(0).getImage(0, 0));
+		dummy2 = new ImageIcon(cards.get(1).getImage(0, 0));
+		
+		Image card1Img = dummy1.getImage();
+		Image card1ImgFin = card1Img.getScaledInstance(75, 109, Image.SCALE_SMOOTH);
+		dummy1.setImage(card1ImgFin);
+		
+		Image card2Img = dummy2.getImage();
+		Image card2ImgFin = card2Img.getScaledInstance(75, 109, Image.SCALE_SMOOTH);
+		dummy2.setImage(card2ImgFin);
+		
+		JLabel dummy1Lbl = new JLabel(dummy1);
+		JLabel dummy2Lbl = new JLabel(dummy1);
+		
+		dummy1Node.setContent(dummy1Lbl);
+		dummy2Node.setContent(dummy2Lbl);
+	/*		img1 = new FileInputStream(cards.get(0).getImage(0, 0));
 			img2 = new FileInputStream(cards.get(1).getImage(0, 0));
 			dummy1.setImage(new Image(img1));
 			dummy2.setImage(new Image(img2));
@@ -148,14 +188,14 @@ public class Player {
 			dummy2.setFitWidth(75);
 			dummy2.setPreserveRatio(true);
 			dummy2.setSmooth(true);
-			dummy2.setCache(true);
+			dummy2.setCache(true); */
 		
-			dummyHand.add(dummy1, 0, 0);
-			dummyHand.add(dummy2, 1, 0);
-		} catch (FileNotFoundException e) {
+			dummyHand.add(dummy1Node, 0, 0);
+			dummyHand.add(dummy2Node, 1, 0);
+	//	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	//		e.printStackTrace();
+	//	}
 		
 		return dummyHand;
 	}

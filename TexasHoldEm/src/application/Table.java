@@ -1,4 +1,6 @@
 package application;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -7,8 +9,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.embed.swing.SwingNode;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
@@ -39,7 +44,7 @@ public class Table implements Runnable /* extends Application */
 	// Pane of components that will constantly change
 	public Group tablePane = new Group();
 	public GridPane riverPane = new GridPane();
-	public ArrayList<ImageView> riverImgs = new ArrayList<ImageView>(); // Stores the images for the river
+	public ArrayList<SwingNode> riverImgs = new ArrayList<SwingNode>(); // Stores the images for the river
 	public ArrayList<GridPane> handList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold the images of every player's cards
 	public ArrayList<GridPane> playerList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold all of the info for each player
 	
@@ -61,12 +66,16 @@ public class Table implements Runnable /* extends Application */
 		return ipPane;
 	}
 	
-	public Group getPane() {
+	public Group getPlayerPane() {
 		return tablePane;
 	}
 	
 	public GridPane getRiverPane() {
-		return riverPane;
+		return riverCards.getPane();
+	}
+	
+	public int getNumPlayers() {
+		return players.size();
 	}
 	
 	public void setRiverPane() {
@@ -118,8 +127,8 @@ public class Table implements Runnable /* extends Application */
 		{
 			riverCards.addCard(deck.nextCard()); // adds 5 cards to the river	
 		}
-		riverPane = riverCards.getPane();
-		riverImgs = riverCards.getCardList();
+		riverCards.updateImgs();
+		riverImgs = riverCards.getCardNodes();
 		deck.shuffle();
 	}
 	

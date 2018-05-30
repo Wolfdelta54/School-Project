@@ -48,6 +48,19 @@ public class MenuGUI extends Application {
 	public TextField server = new TextField();
 	public Label serverLabel = new Label("Server IP:");
 	
+	// Pane of components for the wait screen, shown only to hosts when server is started, requires at least 2 players to move on
+	public Group waitPane = new Group();
+	public Label info = new Label("2 players are required");
+	public Label numPlayers = new Label();
+	public Button start = new Button("Start");
+	
+	// Client wait pane
+	public boolean srvrLive = false;
+	public Group clWaitPane = new Group();
+	public Label clInfo = new Label("Please wait");
+	
+	Table table = new Table(4444);
+	
 	@Override
 	public void start(Stage primaryStage) {
 		// New pane for Username components
@@ -89,6 +102,8 @@ public class MenuGUI extends Application {
         mainMenu.getChildren().add(menuBG);
         mainMenu.getChildren().add(mainMenuOptions);
         
+        setUpWait();
+        
         scene = new Scene(mainMenu, 300, 250);
         
         // Add style sheet to Scene
@@ -105,6 +120,24 @@ public class MenuGUI extends Application {
         		System.exit(0);
         	}
         });
+	}
+	
+	public void setUpWait() {		
+		start.setTranslateX(150);
+		start.setTranslateY(175);
+		
+		info.setTranslateX(25);
+		info.setTranslateY(25);
+		
+		clInfo.setTranslateX(25);
+		clInfo.setTranslateY(25);
+		
+		waitPane.getChildren().add(menuBG);
+		waitPane.getChildren().add(start);
+		waitPane.getChildren().add(info);
+		
+		clWaitPane.getChildren().add(menuBG);
+		clWaitPane.getChildren().add(clInfo);
 	}
 	
 	public static void main(String[] args) {
@@ -141,9 +174,24 @@ public class MenuGUI extends Application {
 				server.setText("");
 			}
 			else {
+				if(srvrLive == false) {
+					Scene wait = new Scene(clWaitPane, 300, 250);
+					primaryStage.setScene(wait);
+					while(srvrLive == false) {
+						// do nothing
+					}
+				}
+				
 				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
 				play.addHand();
 				play.sendJoin();
+				
+				GridPane river = table.getRiverPane();
+				river.setTranslateX(312);
+				river.setTranslateY(180);
+				
+				play.getPane().getChildren().add(river);
+				
 				Thread playStart = new Thread(play);
 				playStart.start();
 				gameScene = play.getScene();
@@ -152,8 +200,9 @@ public class MenuGUI extends Application {
 		});
 		
 		host.setOnAction(event -> {
-			Table table = new Table(4444);
-			Thread srvStart = new Thread(table);
+			Scene wait = new Scene(waitPane, 300, 250);
+			primaryStage.setScene(wait);
+		/*	Thread srvStart = new Thread(table);
 			srvStart.start();
 			
 			String ipStorage = "0.0.0.0";
@@ -170,6 +219,12 @@ public class MenuGUI extends Application {
 			table.deal();
 			play.addHand();
 			play.sendJoin();
+			
+			GridPane river = table.getRiverPane();
+			river.setTranslateX(312);
+			river.setTranslateY(180);
+			
+			play.getPane().getChildren().add(river);
 			Thread playStart = new Thread(play);
 			playStart.start();
 			BorderPane pane = new BorderPane();
@@ -179,7 +234,47 @@ public class MenuGUI extends Application {
 			pane.setCenter(play.getPane());
 			pane.setTop(table.getIpPane());
 			gameScene = new Scene(pane, 1000, 750);
-			primaryStage.setScene(gameScene);
+			primaryStage.setScene(gameScene); */
+		});
+		
+		start.setOnAction(event -> {
+			if(table.getNumPlayers() > 1) {
+				Thread srvStart = new Thread(table);
+				srvStart.start();
+				
+				srvrLive = true;
+			
+				String ipStorage = "0.0.0.0";
+			
+				try {
+					InetAddress ipAddr = InetAddress.getLocalHost();
+					ipStorage = ipAddr.getHostAddress();
+				} catch (UnknownHostException ex) {
+					ex.printStackTrace();
+				}
+			
+				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+				table.addPlayer(play.getPlayer());
+				table.deal();
+				play.addHand();
+				play.sendJoin();
+			
+				GridPane river = table.getRiverPane();
+				river.setTranslateX(312);
+				river.setTranslateY(180);
+			
+				play.getPane().getChildren().add(river);
+				Thread playStart = new Thread(play);
+				playStart.start();
+				BorderPane pane = new BorderPane();
+			//	table.getPotLbl().setTranslateX(450);
+			//	table.getPotLbl().setTranslateY(300);
+			//	play.getPane().getChildren().add(table.getPotLbl());
+				pane.setCenter(play.getPane());
+				pane.setTop(table.getIpPane());
+				gameScene = new Scene(pane, 1000, 750);
+				primaryStage.setScene(gameScene);	
+			}
 		});
 	}
 	
