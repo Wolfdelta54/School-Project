@@ -202,16 +202,18 @@ public class MenuGUI extends Application {
 							while(table.isLive() == false) {
 								// do nothing
 							}
-							play.addHand();
+							if(table.isLive() == true) {
+								play.addHand();
 				
-							GridPane river = table.getRiverPane();
-							river.setTranslateX(312);
-							river.setTranslateY(180);
+								GridPane river = table.getRiverPane();
+								river.setTranslateX(312);
+								river.setTranslateY(180);
 				
-							play.getPane().getChildren().add(river);
+								play.getPane().getChildren().add(river);
 				
-							gameScene = play.getScene();
-							primaryStage.setScene(gameScene);
+								gameScene = play.getScene();
+								primaryStage.setScene(gameScene);
+							}
 						}
 					});
 					waitThread.start();
