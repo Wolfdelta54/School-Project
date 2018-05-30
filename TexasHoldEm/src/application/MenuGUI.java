@@ -213,22 +213,31 @@ public class MenuGUI extends Application {
 									@Override
 									public void run() {
 										if(play.srvrLive == true) {
-											test.setText("true");
 											count.set(0);
+											play.addHand();
+											
+											GridPane river = table.getRiverPane();
+											river.setTranslateX(312);
+											river.setTranslateY(180);
+							
+											play.getPane().getChildren().add(river);
+							
+											gameScene = play.getScene();
+											primaryStage.setScene(gameScene);
 										}
 										else {
 											int val = count.getAndSet(-1);
-											test.setText("false");
 										}
 									}
 								});
 							}
 						}
 					});
-					test.textProperty().addListener(new ChangeListener<String>() {
+				/*	test.textProperty().addListener(new ChangeListener<String>() {
 						@Override
 						public void changed(final ObservableValue<? extends String> observable, final String oldVal, final String newVal) {
 							if(newVal.equals("true")) {
+								System.out.println(test.getText());
 										play.addHand();
 										
 										GridPane river = table.getRiverPane();
@@ -242,7 +251,7 @@ public class MenuGUI extends Application {
 							}
 							
 						}
-					});
+					}); */
 					
 				/*	Thread waitThread = new Thread(new Runnable() {
 						public void run() {
