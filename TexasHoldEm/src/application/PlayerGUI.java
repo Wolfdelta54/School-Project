@@ -419,7 +419,7 @@ public class PlayerGUI implements Runnable {
 			public void run() {
 				int stop = 0;
 				while(stop == 0) {
-					if(srvrLive == true) {
+					if(player.isLive() == true) {
 						srvrLiveProperty.set(1);
 						System.out.println("srvrLive has changed, PlayerGUI");
 						stop = 1;
