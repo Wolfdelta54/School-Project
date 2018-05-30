@@ -162,9 +162,11 @@ public class Table implements Runnable /* extends Application */
 		else {
 			action = input.substring(input.indexOf(";") + 1);
 		}
+		ArrayList<String> names = new ArrayList<String>();
 		
 		// Go through the list of players looking for the one who's username matches that of the executor
 		for(int i = 0; i < players.size(); i++) {
+			names.add(players.get(i).getName());
 			if(user.equals(players.get(i).getName())) {
 				// Set active to false if the action was Fold
 				if(action.equalsIgnoreCase("Fold")) {
@@ -192,6 +194,11 @@ public class Table implements Runnable /* extends Application */
 					System.out.println("Checking is basically doing nothing");
 				}
 			}
+		}
+		
+		if(!names.contains(user)) {
+			addPlayer(new Player(user));
+			System.out.println(players.size());
 		}
 	}
 	
@@ -308,6 +315,7 @@ public class Table implements Runnable /* extends Application */
 				Thread thread = new Thread(client);
 				thread.start();
 				clients.add(client);
+				System.out.println(players.size());
 			} catch (IOException ex) {
 				System.out.println("User: " + " has failed to connect");
 			}
