@@ -1,6 +1,4 @@
 package application;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -9,17 +7,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 
 public class Table implements Runnable /* extends Application */
 {
@@ -28,10 +19,10 @@ public class Table implements Runnable /* extends Application */
 	
 	private int serverPort;
 	public List<ClientThread> clients;
+	ArrayList<Boolean> hasMatched = new ArrayList<Boolean>(); // Used to determine if betting round has ended
 
 	private int pot = 0; // initializes pot to 0
 	private ArrayList<Player> players = new ArrayList<Player>(); // list of players and their attributes
-	private ArrayList<PlayerGUI> playersGUI = new ArrayList<PlayerGUI>();
 	private final River riverCards = new River();
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
@@ -127,6 +118,8 @@ public class Table implements Runnable /* extends Application */
 		{
 			riverCards.addCard(deck.nextCard()); // adds 5 cards to the river	
 		}
+		riverPane = riverCards.getPane();
+		riverImgs = riverCards.getCardList();
 		deck.shuffle();
 	}
 	
@@ -156,8 +149,8 @@ public class Table implements Runnable /* extends Application */
 				}
 				// Update balance of the executor and update the current bet
 				else if(action.equalsIgnoreCase("Bet") || action.equalsIgnoreCase("Raise") || action.equalsIgnoreCase("Call")) {
-					players.get(i).updateBal(0 - amount);
 					pot = pot + amount;
+					players.get(i).updateBal(0 - amount);
 					
 					if(amount > highBet) {
 						highBet = amount;
@@ -176,6 +169,74 @@ public class Table implements Runnable /* extends Application */
 					System.out.println("Checking is basically doing nothing");
 				}
 			}
+		}
+	}
+	
+	public void checkRndEnd() {
+		
+		while(hasMatched.size() < players.size()) {
+			hasMatched.add(false);
+		}
+		
+		for(int i = 0; i < players.size(); i++) {
+			if(players.get(i).getActive() == false || players.get(i).getAllIn() == true || players.get(i).getRndBet() == highBet) {
+				hasMatched.set(i, true);
+			}
+			else {
+				hasMatched.set(i, false);
+			}
+		}
+		
+		if(hasMatched.contains(false) == false) {
+			curRnd++;
+			if(curRnd > 3) {
+				nextHand();
+			}
+			else {
+				showRiver(curRnd);
+			}
+		}
+	}
+	
+	public void nextHand() {
+		curRnd = 0;
+		
+		for(int i = 0; i < players.size(); i++) {
+			players.get(i).setActive(true);
+			players.get(i).setCurrent(false);
+			players.get(i).setStartBal(players.get(i).getBal());
+		}
+		showRiver(0);
+		resetCards();
+		deal();
+	}
+	
+	public void showRiver(int rnd) {
+		if(rnd == 0) {
+			riverImgs.get(0).setVisible(false);
+			riverImgs.get(1).setVisible(false);
+			riverImgs.get(2).setVisible(false);
+			riverImgs.get(3).setVisible(false);
+			riverImgs.get(4).setVisible(false);
+		}
+		else if(rnd == 1) {
+			riverImgs.get(0).setVisible(true);
+			riverImgs.get(1).setVisible(true);
+			riverImgs.get(2).setVisible(true);
+		}
+		else if(rnd == 2) {
+			riverImgs.get(3).setVisible(true);			
+		}
+		else if(rnd == 3) {
+			riverImgs.get(4).setVisible(true);
+		}
+	}
+	
+	public void resetCards() {
+		riverCards.resetCard();
+		
+		for(int i = 0; i < players.size(); i++) {
+			players.get(i).resetHand();
 		}
 	}
 	
@@ -219,6 +280,7 @@ public class Table implements Runnable /* extends Application */
 				Socket socket = serverSocket.accept();
 				System.out.println("A new user has connected");
 				System.out.println("From: " + socket.getRemoteSocketAddress());
+				checkRndEnd();
 				ClientThread client = new ClientThread(this, socket);
 				Thread thread = new Thread(client);
 				thread.start();

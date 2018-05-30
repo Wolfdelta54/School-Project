@@ -11,6 +11,7 @@ import javafx.scene.layout.GridPane;
 
 public class Player {
 	public int bal = 500; // Player's current balance
+	public int startBal = 500;
 	public int potIn = 0;
 	public String name = ""; // Player's username
 	public Hand hand;
@@ -26,6 +27,7 @@ public class Player {
 	public ImageView dummy1 = new ImageView();
 	public ImageView dummy2 = new ImageView();
 	public int pot = 0;
+	public int rndBet = 0;
 	
 	public Player(String name) {
 		this.name = name;
@@ -71,6 +73,33 @@ public class Player {
 		pot = newPot;
 		System.out.println("Current pot (Player) " + pot);
 		System.out.println(this);
+	}
+	
+	public int getRndBet() {
+		rndBet = startBal - bal;
+		return rndBet;
+	}
+	
+	public void setStartBal(int num) {
+		startBal = num;
+	}
+	
+	public void resetHand() {
+		hand.resetCard();
+		cards.clear();
+	}
+	
+	public boolean getAllIn() {
+		boolean isAllIn;
+		
+		if(bal == 0) {
+			isAllIn = true;
+		}
+		else {
+			isAllIn = false;
+		}
+		
+		return isAllIn;
 	}
 	
 	public GridPane getHandPane() {

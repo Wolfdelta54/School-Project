@@ -19,11 +19,17 @@ public class River
 	public ImageView card3 = new ImageView();
 	public ImageView card4 = new ImageView();
 	public ImageView card5 = new ImageView();
+	public ArrayList<ImageView> cards = new ArrayList<ImageView>();
 	
 	// Creates the river
 	public River()
 	{
 		riverCards = new ArrayList<Card>();
+		cards.add(card1);
+		cards.add(card2);
+		cards.add(card3);
+		cards.add(card4);
+		cards.add(card5);
 	}
 	
 	// Returns the cards in the river
@@ -42,6 +48,10 @@ public class River
 	public void resetCard()
 	{
 		riverCards.clear();
+	}
+	
+	public ArrayList<ImageView> getCardList() {
+		return cards;
 	}
 	
 	public GridPane getPane() {

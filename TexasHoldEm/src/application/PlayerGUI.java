@@ -44,6 +44,8 @@ public class PlayerGUI implements Runnable {
 	public SwingNode sNode = new SwingNode();
 	public JLabel potLbl = new JLabel("$0");
 	public int potVal = 0;
+	public int rndBet = 0;
+	public boolean isAllIn;
 	
 	public boolean wasSent = false;
 	
@@ -191,6 +193,21 @@ public class PlayerGUI implements Runnable {
 						curBet = bet;
 						updateBtns();
 						System.out.println(player + " PlayerGUI");
+						rndBet = player.getRndBet();
+					}
+					else if(bet == player.getBal()) {
+						if(gameStage.getChildren().contains(errMsg)) {
+							gameStage.getChildren().remove(errMsg);
+						}
+						player.updateBal(-bet, betAmount);
+						player.setCurrent(false);
+						isAllIn = player.getAllIn();
+						balance.setText("$" + player.getBal());
+						actions = userName + ";bet;" + bet;
+						curBet = bet;
+						updateBtns();
+						System.out.println(player + " PlayerGUI");
+						rndBet = player.getRndBet();
 					}
 					else {
 						gameStage.getChildren().add(errMsg);
@@ -206,12 +223,30 @@ public class PlayerGUI implements Runnable {
 					int raise = Integer.parseInt(betAmount.getText());
 					int bet = curBet + raise;
 					if(bet < player.getBal()) {
+						if(gameStage.getChildren().contains(errMsg)) {
+							gameStage.getChildren().remove(errMsg);
+						}
 						player.updateBal(-bet, betAmount);
 						player.setCurrent(false);
 						balance.setText("$" + player.getBal());
 						actions = userName + ";raise;" + bet;
 						curBet = bet;
 						updateBtns();
+						rndBet = player.getRndBet();
+					}
+					else if(bet == player.getBal()) {
+						if(gameStage.getChildren().contains(errMsg)) {
+							gameStage.getChildren().remove(errMsg);
+						}
+						player.updateBal(-bet, betAmount);
+						player.setCurrent(false);
+						isAllIn = player.getAllIn();
+						balance.setText("$" + player.getBal());
+						actions = userName + ";bet;" + bet;
+						curBet = bet;
+						updateBtns();
+						System.out.println(player + " PlayerGUI");
+						rndBet = player.getRndBet();
 					}
 					else {
 						gameStage.getChildren().add(errMsg);
@@ -229,6 +264,21 @@ public class PlayerGUI implements Runnable {
 					balance.setText("$" + player.getBal());
 					actions = userName + ";call;" + curBet;
 					updateBtns();
+					rndBet = player.getRndBet();
+				}
+				else if(curBet == player.getBal()) {
+					if(gameStage.getChildren().contains(errMsg)) {
+						gameStage.getChildren().remove(errMsg);
+					}
+					int bet = curBet - rndBet;
+					player.updateBal(-bet, betAmount);
+					player.setCurrent(false);
+					isAllIn = player.getAllIn();
+					balance.setText("$" + player.getBal());
+					actions = userName + ";bet;" + bet;
+					updateBtns();
+					System.out.println(player + " PlayerGUI");
+					rndBet = player.getRndBet();
 				}
 				else {
 					gameStage.getChildren().add(errMsg);
@@ -331,12 +381,22 @@ public class PlayerGUI implements Runnable {
 		return player;
 	}
 	
-	public void updatePot() {
+	public void updateVars() {
 		String potTxt = potLbl.getText();
 		potVal = Integer.parseInt(potTxt.substring(potTxt.indexOf("$") + 1));
 		if(potVal != player.getCurPot()) {
 			potVal = player.getCurPot();
 			potLbl.setText("$" + potVal);
+		}
+		
+		if(curBet != player.getCurBet()) {
+			curBet = player.getCurBet();
+		}
+		
+		int bal = Integer.parseInt(balance.getText().substring(1));
+		if(bal != player.getBal()) {
+			bal = player.getBal();
+			balance.setText("$" + bal);
 		}
 	}
 	
@@ -399,7 +459,7 @@ public class PlayerGUI implements Runnable {
 					// then empties the string to avoid overflow/overload
 					actions = "none";
 				}
-				updatePot();
+				updateVars();
 			}
 		} catch (IOException ex) {
 			// Catches an error that is caused by an unavailable host

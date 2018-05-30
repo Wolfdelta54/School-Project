@@ -142,6 +142,7 @@ public class MenuGUI extends Application {
 			}
 			else {
 				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+				play.addHand();
 				play.sendJoin();
 				Thread playStart = new Thread(play);
 				playStart.start();
