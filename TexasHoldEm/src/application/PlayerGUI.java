@@ -42,7 +42,7 @@ public class PlayerGUI implements Runnable {
 	public Button stand = new Button("Stand Up"), leave = new Button("Leave Server"); // Buttons for game exiting
 	public Pane spring = new Pane(); // Used to create an empty column
 	public SwingNode sNode = new SwingNode();
-	public JLabel potLbl = new JLabel("$");
+	public JLabel potLbl = new JLabel("$0");
 	public int potVal = 0;
 	
 	public boolean wasSent = false;
