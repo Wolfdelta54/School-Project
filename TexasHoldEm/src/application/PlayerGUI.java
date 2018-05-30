@@ -332,6 +332,8 @@ public class PlayerGUI implements Runnable {
 	}
 	
 	public void updatePot() {
+		String potTxt = potLbl.getText();
+		potVal = Integer.parseInt(potTxt.substring(potTxt.indexOf("$") + 1));
 		if(potVal != player.getCurPot()) {
 			potVal = player.getCurPot();
 			potLbl.setText("$" + potVal);

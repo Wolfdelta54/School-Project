@@ -70,6 +70,7 @@ public class Player {
 	public void setPot(int newPot) {
 		pot = newPot;
 		System.out.println("Current pot (Player) " + pot);
+		System.out.println(this);
 	}
 	
 	public GridPane getHandPane() {

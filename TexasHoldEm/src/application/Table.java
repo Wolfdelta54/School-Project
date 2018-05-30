@@ -1,25 +1,17 @@
 package application;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 
 public class Table implements Runnable /* extends Application */
 {
@@ -156,8 +148,12 @@ public class Table implements Runnable /* extends Application */
 				}
 				// Update balance of the executor and update the current bet
 				else if(action.equalsIgnoreCase("Bet") || action.equalsIgnoreCase("Raise") || action.equalsIgnoreCase("Call")) {
-					players.get(i).updateBal(-amount);
-					pot += amount;
+					players.get(i).updateBal(0 - amount);
+					pot = pot + amount;
+					
+					if(amount > highBet) {
+						highBet = amount;
+					}
 					
 					for(int j = 0; j < players.size(); j++) {
 						players.get(j).setCurBet(amount);
@@ -213,7 +209,7 @@ public class Table implements Runnable /* extends Application */
 		while(true) {
 			try {
 				Socket socket = serverSocket.accept();
-				System.out.println("User: " + " has connected");
+				System.out.println("A new user has connected");
 				System.out.println("From: " + socket.getRemoteSocketAddress());
 				ClientThread client = new ClientThread(this, socket);
 				Thread thread = new Thread(client);
