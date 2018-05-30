@@ -190,12 +190,6 @@ public class MenuGUI extends Application {
 				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
 				play.sendJoin();
 				
-				GridPane river = table.getRiverPane();
-				river.setTranslateX(312);
-				river.setTranslateY(180);
-				
-				play.getPane().getChildren().add(river);
-				
 				Thread playStart = new Thread(play);
 				playStart.start();
 				
@@ -207,6 +201,12 @@ public class MenuGUI extends Application {
 					}
 				}
 				play.addHand();
+				
+				GridPane river = table.getRiverPane();
+				river.setTranslateX(312);
+				river.setTranslateY(180);
+				
+				play.getPane().getChildren().add(river);
 				
 				gameScene = play.getScene();
 				primaryStage.setScene(gameScene);
@@ -229,12 +229,7 @@ public class MenuGUI extends Application {
 			play = new PlayerGUI(user.getText(), ipStorage, 4444);
 			table.addPlayer(play.getPlayer());
 			play.sendJoin();
-		
-			GridPane river = table.getRiverPane();
-			river.setTranslateX(312);
-			river.setTranslateY(180);
-		
-			play.getPane().getChildren().add(river);
+			
 			Thread playStart = new Thread(play);
 			playStart.start();
 			Scene wait = new Scene(waitPane, 300, 250);
@@ -302,6 +297,12 @@ public class MenuGUI extends Application {
 				playStart.start(); */
 				table.deal();
 				play.addHand();
+				
+				GridPane river = table.getRiverPane();
+				river.setTranslateX(312);
+				river.setTranslateY(180);
+			
+				play.getPane().getChildren().add(river);
 				BorderPane pane = new BorderPane();
 			//	table.getPotLbl().setTranslateX(450);
 			//	table.getPotLbl().setTranslateY(300);
