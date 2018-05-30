@@ -70,6 +70,8 @@ public class Table implements Runnable /* extends Application */
 	
 	public void setLive(boolean x) {
 		srvrLive = x;
+		System.out.println("Table > setLive");
+		sendStatus();
 	}
 	
 	public GridPane getIpPane() {

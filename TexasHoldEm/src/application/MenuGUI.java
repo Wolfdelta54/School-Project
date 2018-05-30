@@ -352,6 +352,7 @@ public class MenuGUI extends Application {
 		
 		start.setOnAction(event -> {
 			if(table.getNumPlayers() > 1) {
+				System.out.println("MenuGUI > addListeners");
 				table.setLive(true);
 			
 		/*		String ipStorage = "0.0.0.0";
