@@ -57,7 +57,7 @@ public class MenuGUI extends Application {
 	public Button start = new Button("Start");
 	ImageView waitPaneBG = new ImageView();
 	
-	public Group forWait = new Group(); // Stores the PlayerGUI pane while the server is waiting to start the game
+	public PlayerGUI play; // Stores the PlayerGUI pane while the server is waiting to start the game
 	
 	// Client wait pane
 	public boolean srvrLive = false;
@@ -188,7 +188,6 @@ public class MenuGUI extends Application {
 			}
 			else {
 				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
-				play.addHand();
 				play.sendJoin();
 				
 				GridPane river = table.getRiverPane();
@@ -207,6 +206,7 @@ public class MenuGUI extends Application {
 						// do nothing
 					}
 				}
+				play.addHand();
 				
 				gameScene = play.getScene();
 				primaryStage.setScene(gameScene);
@@ -226,10 +226,8 @@ public class MenuGUI extends Application {
 				ex.printStackTrace();
 			}
 		
-			PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+			play = new PlayerGUI(user.getText(), ipStorage, 4444);
 			table.addPlayer(play.getPlayer());
-			table.deal();
-			play.addHand();
 			play.sendJoin();
 		
 			GridPane river = table.getRiverPane();
@@ -239,8 +237,6 @@ public class MenuGUI extends Application {
 			play.getPane().getChildren().add(river);
 			Thread playStart = new Thread(play);
 			playStart.start();
-			
-			forWait = play.getPane();
 			Scene wait = new Scene(waitPane, 300, 250);
 			primaryStage.setScene(wait);
 		/*	Thread srvStart = new Thread(table);
@@ -304,11 +300,13 @@ public class MenuGUI extends Application {
 				play.getPane().getChildren().add(river);
 				Thread playStart = new Thread(play);
 				playStart.start(); */
+				table.deal();
+				play.addHand();
 				BorderPane pane = new BorderPane();
 			//	table.getPotLbl().setTranslateX(450);
 			//	table.getPotLbl().setTranslateY(300);
 			//	play.getPane().getChildren().add(table.getPotLbl());
-				pane.setCenter(forWait);
+				pane.setCenter(play.getPane());
 				pane.setTop(table.getIpPane());
 				gameScene = new Scene(pane, 1000, 750);
 				primaryStage.setScene(gameScene);	
