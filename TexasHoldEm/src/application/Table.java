@@ -43,7 +43,7 @@ public class Table implements Runnable /* extends Application */
 	// Player with the best hand gets the pot then the next hand is dealt and betting commences again
 	public int curRnd = 0;
 	public final int maxRnds = 3;
-	public int highBet = 0; // Stores the highest bet, used to see if all players have bet this amount or have gone all in
+	public int highBet = -50; // Stores the highest bet, used to see if all players have bet this amount or have gone all in
 	
 	// Pane of components that will constantly change
 	public Group tablePane = new Group();

@@ -153,6 +153,7 @@ public class Player {
 					e.printStackTrace();
 				}
 			}
+			System.out.println(name + " balance: " + bal);
 		}
 		else if(amount > 0) {
 			bal += amount;
