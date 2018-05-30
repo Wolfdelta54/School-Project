@@ -8,6 +8,8 @@ import java.net.Socket;
 
 import javax.swing.JLabel;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
@@ -54,6 +56,7 @@ public class PlayerGUI implements Runnable {
 	
 	public Scene scene;
 	public boolean srvrLive = false;
+	public IntegerProperty srvrLiveProperty = new SimpleIntegerProperty(0);
 	
 /*	public static void main(String args[]) {
 		launch(args);
@@ -66,6 +69,8 @@ public class PlayerGUI implements Runnable {
         addImages();
         setUpBtns();
         potAutoUpdate();
+        
+        srvrLiveProperty.set(0);
         
         // Set GameActions position
         gameActions.setTranslateX(75);
@@ -406,6 +411,19 @@ public class PlayerGUI implements Runnable {
 		if(bal != player.getBal()) {
 			bal = player.getBal();
 			balance.setText("$" + bal);
+		}
+		
+		int srvrLiveAsInt = 0;
+		if(srvrLive == true) {
+			srvrLiveAsInt = 1;
+		}
+		else {
+			srvrLiveAsInt = 0;
+			srvrLiveProperty.set(0);
+		}
+		
+		if(srvrLiveProperty.get() != srvrLiveAsInt) {
+			srvrLiveProperty.set(srvrLiveAsInt);
 		}
 	}
 	

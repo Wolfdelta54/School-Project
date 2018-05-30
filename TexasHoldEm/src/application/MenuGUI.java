@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JLabel;
 
@@ -159,12 +160,6 @@ public class MenuGUI extends Application {
 		launch(args);
 	}
 	
-	public void checkStatus(PlayerGUI playGUI) {
-		if(playGUI.isLive() == false) {
-			checkStatus(playGUI);
-		}
-	}
-	
 	// Adds change listener to the UserName textfield
 	public void addListeners(Stage primaryStage) {
 		user.textProperty().addListener(new ChangeListener<String>() {
@@ -205,9 +200,51 @@ public class MenuGUI extends Application {
 				status.setText(play.isLive() + "");
 				
 				if(table.isLive() == false) {
+					Label test = new Label();
 					Scene wait = new Scene(clWaitPane, 300, 250);
 					primaryStage.setScene(wait);
-			/*		Thread waitThread = new Thread(new Runnable() {
+					AtomicInteger count = new AtomicInteger(-1);
+					
+					play.srvrLiveProperty.addListener(new ChangeListener<Number>() {
+						@Override
+						public void changed(final ObservableValue<? extends Number> observable, final Number oldVal, final Number newVal) {
+							if(count.getAndSet(newVal.intValue()) == -1) {
+								Platform.runLater(new Runnable() {
+									@Override
+									public void run() {
+										if(play.srvrLive == true) {
+											test.setText("true");
+											count.set(0);
+										}
+										else {
+											int val = count.getAndSet(-1);
+											test.setText("false");
+										}
+									}
+								});
+							}
+						}
+					});
+					test.textProperty().addListener(new ChangeListener<String>() {
+						@Override
+						public void changed(final ObservableValue<? extends String> observable, final String oldVal, final String newVal) {
+							if(newVal.equals("true")) {
+										play.addHand();
+										
+										GridPane river = table.getRiverPane();
+										river.setTranslateX(312);
+										river.setTranslateY(180);
+						
+										play.getPane().getChildren().add(river);
+						
+										gameScene = play.getScene();
+										primaryStage.setScene(gameScene);
+							}
+							
+						}
+					});
+					
+				/*	Thread waitThread = new Thread(new Runnable() {
 						public void run() {
 							while(play.isLive() == false) {
 								// do nothing
@@ -227,18 +264,19 @@ public class MenuGUI extends Application {
 						}
 					});
 					waitThread.start(); */
-					checkStatus(play);
 				}
-				play.addHand();
+				else {
+					play.addHand();
 				
-				GridPane river = table.getRiverPane();
-				river.setTranslateX(312);
-				river.setTranslateY(180);
+					GridPane river = table.getRiverPane();
+					river.setTranslateX(312);
+					river.setTranslateY(180);
 
-				play.getPane().getChildren().add(river);
+					play.getPane().getChildren().add(river);
 
-				gameScene = play.getScene();
-				primaryStage.setScene(gameScene);				
+					gameScene = play.getScene();
+					primaryStage.setScene(gameScene);
+				}
 			}
 		});
 		
