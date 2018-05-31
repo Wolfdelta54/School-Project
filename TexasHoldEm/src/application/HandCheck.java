@@ -298,11 +298,16 @@ public class HandCheck
 		//FourOfAKind - four of same card
 	private String fourOfAKind(ArrayList<Integer> cardRanks)
 	{
-			if((cardRanks.get(0) == cardRanks.get(1) && cardRanks.get(0) == cardRanks.get(2) && cardRanks.get(0) == cardRanks.get(3)) ||
-					(cardRanks.get(1) == cardRanks.get(2) && cardRanks.get(1) == cardRanks.get(3) && cardRanks.get(1) == cardRanks.get(4)))
-				return "Four of a Kind " ; 
-			return ""; 
-			
+		String result = "";
+
+		for (int i=0;i<cardRanks.size();i++){
+			if (cardRanks.get(i) == 4)
+			{
+				result = "Four of a Kind ";
+				break;
+			}
+		}   
+		return result;
 	}
 		
 		//FullHouse - pair of matching cards + three other matching
