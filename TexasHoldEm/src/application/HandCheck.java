@@ -7,7 +7,7 @@ public class HandCheck
 {
 	public ArrayList<Player> players;
 	public ArrayList<Card> availableCards; 
-	public ArrayList<Card> allCards;
+	public ArrayList<Card> allCards = new ArrayList<Card>();
 	public int pot; 
 	public Player winner;
 	public ArrayList<Hand> hands = new ArrayList<Hand>(); 
@@ -21,40 +21,65 @@ public class HandCheck
 		pot = 0; 
 	}
 	
-	
-	public Card getCard(int i)
-	{
-		return availableCards.get(i);
-	}
-
-	public int numCards()
-	{
-		return availableCards.size();
-	}
 
 	public void setPlayers(ArrayList<Player> players)
 	{
+		int size = players.size(); 
+		System.out.println(players.size());
 		this.players = players; 
-		for(int i=0; i<players.size(); i++)
+		for(int i=0; i<size; i++)
 		{
 			this.hands.add(players.get(i).getHand()); 
 			this.names.add(players.get(i).getName());		
-			}
-			
+		}
+
 	}
 	
 	public void setCards(River river)
 	{
+		availableCards = new ArrayList<Card>();
+		if(!availableCards.isEmpty()) {
+			availableCards.clear();
+		}
 		this.availableCards = river.getCards(); 
+		System.out.println(availableCards.size());
 		//availableCards.addAll(hand.getCards());
 	}
 	
 	public void setList(int index)
 	{
-		allCards = new ArrayList<Card>(); 
-		allCards.addAll(availableCards);
-		allCards.addAll(hands.get(index).getCards()); 
+		allCards.clear(); 
+	//	allCards.addAll(availableCards);
+		//allCards.addAll(hands.get(index).getCards()); 
+		for(int i =0; i<availableCards.size(); i++)
+		{
+			allCards.add(availableCards.get(i));
+
+			System.out.println(availableCards.get(i).toString());
+			System.out.println(allCards.toString());
+		}
 		
+		for(int i=0; i<hands.get(index).getCards().size(); i++)
+		{
+			allCards.add(hands.get(index).getCards().get(i));
+			System.out.println(hands.get(index).getCards().get(i).toString());
+			System.out.println(allCards.toString());
+		}
+		
+	}
+	
+	public ArrayList<Card> getList(int ind) {
+		ArrayList<Card> temp = new ArrayList<Card>();
+		
+		for(int i = 0; i < 5; i++) {
+			temp.add(availableCards.get(i));
+		}
+		
+		for(int i = 0;i < 2; i++) {
+			temp.add(hands.get(ind).getCards().get(i));
+		}
+		
+		return temp;
 	}
 	
 	public ArrayList<String> checkHands()
@@ -63,6 +88,7 @@ public class HandCheck
 		for(int i=0; i<players.size(); i++)
 		{
 		String result = ""; 
+	//	ArrayList<Card> list = getList(i);
 		setList(i); 
 		
 		int[] rankCounterArray = new int[15];
@@ -74,7 +100,7 @@ public class HandCheck
             rankCounterArray[j] =0;
         }
 
-        for (int j=4;j<suitCounterArray.length;j++)
+        for (int j=0;j<suitCounterArray.length;j++)
         {
             suitCounterArray[j] = 0;
         }
@@ -112,11 +138,11 @@ public class HandCheck
         //hands are already sorted by rank and suit for royal and straight flush checks.
 
         //is royal flush?
-        result = royalFlush1(rankCounter, suitCounter);
+        result = royalFlush(rankCounter, suitCounter);
 
         //is straight flush?
         if (result.length() == 0)
-        	result = straightFlush(); 
+        	result = straightFlush(rankCounter, suitCounter); 
         //is four of a kind?
         if (result.length() == 0)
         	result = fourOfAKind(rankCounter);
@@ -160,7 +186,7 @@ public class HandCheck
 	//ORDER OF SUITS = spades, hearts, clubs, diamond
 		
 	//RoyalFlush - 10JQKA of same suit
-	private String royalFlush1(ArrayList<Integer> rankCounter, ArrayList<Integer> suitCounter) 
+	private String royalFlush(ArrayList<Integer> rankCounter, ArrayList<Integer> suitCounter) 
 	{
 		if((rankCounter.get(9)>= 1 &&       	//10
                 rankCounter.get(10) >= 1 &&   //Jack
@@ -172,7 +198,7 @@ public class HandCheck
 			return "Royal Flush" + allCards.get(1).getSuit(); 
 		return ""; 
 	}
-	private String royalFlush() 
+	/*private String royalFlush() 
 	{
 		for(int i=0; i<allCards.size(); i++) //go through all available cards 
 		{
@@ -218,10 +244,10 @@ public class HandCheck
 		
 		return ""; 
 		
-	}
+	}*/
 
 		//StraightFlush - sequential numbers of same suit
-	private String straightFlush1(ArrayList<Integer> rankCounter, ArrayList<Integer> suitCounter)
+	private String straightFlush(ArrayList<Integer> rankCounter, ArrayList<Integer> suitCounter)
 	{
 	        String result = "";
 
@@ -251,7 +277,7 @@ public class HandCheck
 	        return result;
 	}
 	        
-	private String straightFlush()
+	/*private String straightFlush()
 	{
 		for (int i=allCards.size()-1;i>3;i--)
 		{
@@ -294,7 +320,7 @@ public class HandCheck
 		}
 		
 		return ""; 
-	}
+	}*/
 		//FourOfAKind - four of same card
 	private String fourOfAKind(ArrayList<Integer> cardRanks)
 	{
@@ -353,14 +379,14 @@ public class HandCheck
 				suitCounter.get(2) > 4 || suitCounter.get(3) > 4)
 		{
 
-			for (int i=availableCards.size()-1; i>3 ; i--)
+			for (int i=allCards.size()-1; i>3 ; i--)
 			{
-				if (availableCards.get(i).getSuit() == availableCards.get(i-1).getSuit() &&
-						availableCards.get(i).getSuit() == availableCards.get(i-2).getSuit() &&
-						availableCards.get(i).getSuit() == availableCards.get(i-3).getSuit() &&
-						availableCards.get(i).getSuit() == availableCards.get(i-4).getSuit())
+				if (allCards.get(i).getSuit() == allCards.get(i-1).getSuit() &&
+						allCards.get(i).getSuit() == allCards.get(i-2).getSuit() &&
+						allCards.get(i).getSuit() == allCards.get(i-3).getSuit() &&
+						allCards.get(i).getSuit() == allCards.get(i-4).getSuit())
 				{
-					result = "Flush " + availableCards.get(2).getSuit();
+					result = "Flush " + allCards.get(2).getSuit();
 					break;
 				}
 			}           
@@ -440,11 +466,11 @@ public class HandCheck
 			{
 				// because the aces are the highest cards yet 
 				// swap places so aces show first as highest pair
-				result = "Two Pair: " + availableCards.get(secondPair).getRank() + "'s and " + availableCards.get(firstPair).getRank() + "'s";
+				result = "Two Pair: " + allCards.get(secondPair).getRank() + "'s and " + allCards.get(firstPair).getRank() + "'s";
 			}
 			else 
 			{
-				result = "Two Pair: " + availableCards.get(firstPair).getRank() + "'s and " + availableCards.get(secondPair).getRank() + "'s";
+				result = "Two Pair: " + allCards.get(firstPair).getRank() + "'s and " + allCards.get(secondPair).getRank() + "'s";
 			}           
 		}
 

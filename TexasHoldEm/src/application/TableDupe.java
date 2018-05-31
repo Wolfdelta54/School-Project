@@ -118,10 +118,10 @@ public class TableDupe
 		
 		for(int i = 0; i < 5; i++)
 		{
-			for(int j = 0; j < players.size(); j++) {
+		//	for(int j = 0; j < players.size(); j++) {
 				Card nextCrd = deck.nextCard();
 				riverCards.addCard(nextCrd);
-			}
+		//	}
 		}
 		
 		deck.shuffle();
