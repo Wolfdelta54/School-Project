@@ -300,7 +300,7 @@ public class HandCheck
 	{
 			if((cardRanks.get(0) == cardRanks.get(1) && cardRanks.get(0) == cardRanks.get(2) && cardRanks.get(0) == cardRanks.get(3)) ||
 					(cardRanks.get(1) == cardRanks.get(2) && cardRanks.get(1) == cardRanks.get(3) && cardRanks.get(1) == cardRanks.get(4)))
-				return "Four of a Kind " + allCards.get(2).getRank(); 
+				return "Four of a Kind " ; 
 			return ""; 
 			
 	}
