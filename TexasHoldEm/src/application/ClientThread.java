@@ -46,7 +46,7 @@ public class ClientThread implements Runnable
 		try {
 			// setup
 	//		this.clientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
-	//		OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+			OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
 			@SuppressWarnings("resource")
 	//		Scanner in = new Scanner(socket.getInputStream()).useDelimiter("\\A");
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -79,7 +79,7 @@ public class ClientThread implements Runnable
 					String nextSend = "";
 				//	OutputStreamWriter thatClientOut = this.table.getClients().get(this.table.getClients().indexOf(this)).getWriter();
 				//	OutputStreamWriter thatClientOut = this.getWriter();
-					OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+				//	OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
 					
 					synchronized(changesToSend) {
 						// determines if the player as done anything
@@ -90,8 +90,6 @@ public class ClientThread implements Runnable
 					// Prints the other players' actions to the client's terminal
 					thatClientOut.write(nextSend + "\n");
 					thatClientOut.flush();
-					
-					thatClientOut.close();
 				}
 			}
 			System.out.println("While loop as been closed");
