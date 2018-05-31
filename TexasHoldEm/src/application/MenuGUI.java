@@ -210,18 +210,22 @@ public class MenuGUI extends Application {
 							int stop = 0;
 							while(stop == 0) {
 								if(play.isLive() == true) {
-									System.out.println("srvrLive has changed, MenuGUI");
-									count.set(0);
-									play.addHand();
+									Platform.runLater(new Runnable() {
+										public void run() {
+											System.out.println("srvrLive has changed, MenuGUI");
+											count.set(0);
+											play.addHand();
 									
-									GridPane river = table.getRiverPane();
-									river.setTranslateX(312);
-									river.setTranslateY(180);
+											GridPane river = table.getRiverPane();
+											river.setTranslateX(312);
+											river.setTranslateY(180);
+									
+											play.getPane().getChildren().add(river);
 					
-									play.getPane().getChildren().add(river);
-					
-									gameScene = play.getScene();
-									primaryStage.setScene(gameScene);
+											gameScene = play.getScene();
+											primaryStage.setScene(gameScene);
+										}
+									});
 									stop = 1;
 								}
 								else {
