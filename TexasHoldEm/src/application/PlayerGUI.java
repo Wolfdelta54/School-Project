@@ -421,11 +421,13 @@ public class PlayerGUI implements Runnable {
 				while(stop == 0) {
 					if(player.isLive() == true) {
 						srvrLiveProperty.set(1);
+						srvrLive = true;
 						System.out.println("srvrLive has changed, PlayerGUI");
 						stop = 1;
 					}
 					else {
 						srvrLiveProperty.set(0);
+						srvrLive = false;
 					}
 					try {
 						Thread.sleep(500);
