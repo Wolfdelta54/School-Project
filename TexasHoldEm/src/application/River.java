@@ -46,7 +46,9 @@ public class River
 		cardNodes.add(card4Node);
 		cardNodes.add(card5Node);
 	}
-	
+	public River(String tester){
+		riverCards = new ArrayList<Card>();
+	}
 	// Returns the cards in the river
 	public ArrayList<Card> getCards()
 	{
@@ -62,9 +64,9 @@ public class River
 	{
 		riverCards.add(card);
 		
-		if(riverCards.size() == 5) {
+		/*if(riverCards.size() == 5) {
 			updateImgs();
-		}
+		}*/
 	}
 	
 	// Adds a card to the river
