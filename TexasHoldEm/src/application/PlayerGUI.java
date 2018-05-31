@@ -1,13 +1,18 @@
 package application;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
@@ -16,7 +21,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -42,8 +46,11 @@ public class PlayerGUI implements Runnable {
 	public Button stand = new Button("Stand Up"), leave = new Button("Leave Server"); // Buttons for game exiting
 	public Pane spring = new Pane(); // Used to create an empty column
 	public SwingNode sNode = new SwingNode();
-	public JLabel potLbl = new JLabel("$");
+	public JLabel potLbl = new JLabel("$0");
 	public int potVal = 0;
+	public int rndBet = 0;
+	public boolean isAllIn;
+	public int highestBet = 0;
 	
 	public boolean wasSent = false;
 	
@@ -51,6 +58,16 @@ public class PlayerGUI implements Runnable {
 	public int curBet = 0; // Gets the current bet amount
 	
 	public Scene scene;
+	public boolean srvrLive = false;
+	public IntegerProperty srvrLiveProperty = new SimpleIntegerProperty(0);
+	
+	// River GUI components
+	public GridPane riverPane = new GridPane();
+	public ArrayList<SwingNode> riverNodes = new ArrayList<SwingNode>();
+	public ArrayList<ImageIcon> riverIcons = new ArrayList<ImageIcon>();
+	public ArrayList<String> riverCards = new ArrayList<String>();
+	
+	public River river = new River();
 	
 /*	public static void main(String args[]) {
 		launch(args);
@@ -64,6 +81,12 @@ public class PlayerGUI implements Runnable {
         setUpBtns();
         potAutoUpdate();
         
+        riverPane = river.getPane();
+        riverNodes = river.getCardNodes();
+        riverIcons = river.getCardList();
+        
+        srvrLiveProperty.set(0);
+        
         // Set GameActions position
         gameActions.setTranslateX(75);
         gameActions.setTranslateY(625);
@@ -72,6 +95,7 @@ public class PlayerGUI implements Runnable {
     		sNode.setTranslateX(450);
     		sNode.setTranslateY(300);
     		sNode.setContent(potLbl);
+			updateVars();
         
         // Add background and game actions to main pane
         gameStage.getChildren().add(tableImage);
@@ -91,6 +115,13 @@ public class PlayerGUI implements Runnable {
         addImages();
         setUpBtns();
         
+        riverPane = river.getPane();
+        riverNodes = river.getCardNodes();
+        riverIcons = river.getCardList();
+        
+		riverPane.setTranslateX(312);
+		riverPane.setTranslateY(180);
+        
         // Set balance label text
         balance.setText("$" + player.getBal());
         
@@ -103,6 +134,7 @@ public class PlayerGUI implements Runnable {
 		sNode.setTranslateX(450);
 		sNode.setTranslateY(300);
 		sNode.setContent(potLbl);
+		updateVars();
         
         // Set the size of the gaps between each row and column
         gameActions.setHgap(12);
@@ -113,6 +145,7 @@ public class PlayerGUI implements Runnable {
         gameStage.getChildren().add(tableImage);
         gameStage.getChildren().add(gameActions);
 		gameStage.getChildren().add(sNode);
+		gameStage.getChildren().add(riverPane);
         
         scene = new Scene(gameStage, 1000, 700);
         scene.getStylesheets().add("application/PlayerGUI.css");
@@ -146,6 +179,10 @@ public class PlayerGUI implements Runnable {
 		if(!potTxt.equals(temp)) {
 			potLbl.setText(temp);
 		}
+	}
+	
+	public boolean isLive() {
+		return srvrLive;
 	}
 	
 	// Adds change listener to the bet textfield and mouse listeners onto the buttons
@@ -191,6 +228,21 @@ public class PlayerGUI implements Runnable {
 						curBet = bet;
 						updateBtns();
 						System.out.println(player + " PlayerGUI");
+						rndBet = player.getRndBet();
+					}
+					else if(bet == player.getBal()) {
+						if(gameStage.getChildren().contains(errMsg)) {
+							gameStage.getChildren().remove(errMsg);
+						}
+						player.updateBal(-bet, betAmount);
+						player.setCurrent(false);
+						isAllIn = player.getAllIn();
+						balance.setText("$" + player.getBal());
+						actions = userName + ";bet;" + bet;
+						curBet = bet;
+						updateBtns();
+						System.out.println(player + " PlayerGUI");
+						rndBet = player.getRndBet();
 					}
 					else {
 						gameStage.getChildren().add(errMsg);
@@ -206,12 +258,30 @@ public class PlayerGUI implements Runnable {
 					int raise = Integer.parseInt(betAmount.getText());
 					int bet = curBet + raise;
 					if(bet < player.getBal()) {
+						if(gameStage.getChildren().contains(errMsg)) {
+							gameStage.getChildren().remove(errMsg);
+						}
 						player.updateBal(-bet, betAmount);
 						player.setCurrent(false);
 						balance.setText("$" + player.getBal());
 						actions = userName + ";raise;" + bet;
 						curBet = bet;
 						updateBtns();
+						rndBet = player.getRndBet();
+					}
+					else if(bet == player.getBal()) {
+						if(gameStage.getChildren().contains(errMsg)) {
+							gameStage.getChildren().remove(errMsg);
+						}
+						player.updateBal(-bet, betAmount);
+						player.setCurrent(false);
+						isAllIn = player.getAllIn();
+						balance.setText("$" + player.getBal());
+						actions = userName + ";bet;" + bet;
+						curBet = bet;
+						updateBtns();
+						System.out.println(player + " PlayerGUI");
+						rndBet = player.getRndBet();
 					}
 					else {
 						gameStage.getChildren().add(errMsg);
@@ -229,6 +299,21 @@ public class PlayerGUI implements Runnable {
 					balance.setText("$" + player.getBal());
 					actions = userName + ";call;" + curBet;
 					updateBtns();
+					rndBet = player.getRndBet();
+				}
+				else if(curBet == player.getBal()) {
+					if(gameStage.getChildren().contains(errMsg)) {
+						gameStage.getChildren().remove(errMsg);
+					}
+					int bet = curBet - rndBet;
+					player.updateBal(-bet, betAmount);
+					player.setCurrent(false);
+					isAllIn = player.getAllIn();
+					balance.setText("$" + player.getBal());
+					actions = userName + ";bet;" + bet;
+					updateBtns();
+					System.out.println(player + " PlayerGUI");
+					rndBet = player.getRndBet();
 				}
 				else {
 					gameStage.getChildren().add(errMsg);
@@ -254,11 +339,15 @@ public class PlayerGUI implements Runnable {
 		try {
 			timg = new FileInputStream("Images/AdobeStock_15009121Poker.png");
 			bgimg = new FileInputStream("Images/woodTexture.jpg");
-			tableImage.setImage(new Image(timg));
-			bgImage.setImage(new Image(bgimg));
+			tableImage.setImage(new javafx.scene.image.Image(timg));
+			bgImage.setImage(new javafx.scene.image.Image(bgimg));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void prntPlayer() {
+		System.out.println(player);
 	}
 	
 	// Adds the buttons to the pane
@@ -331,10 +420,160 @@ public class PlayerGUI implements Runnable {
 		return player;
 	}
 	
-	public void updatePot() {
+	public void updateVars() {
+		String potTxt = potLbl.getText();
+		potVal = Integer.parseInt(potTxt.substring(potTxt.indexOf("$") + 1));
 		if(potVal != player.getCurPot()) {
 			potVal = player.getCurPot();
 			potLbl.setText("$" + potVal);
+		}
+		
+		if(curBet != player.getCurBet()) {
+			curBet = player.getCurBet();
+		}
+		
+		int bal = Integer.parseInt(balance.getText().substring(1));
+		if(bal != player.getBal()) {
+			bal = player.getBal();
+			balance.setText("$" + bal);
+		}
+		
+		Thread srvrChange = new Thread(new Runnable() {
+			public void run() {
+				int stop = 0;
+				while(stop == 0) {
+					if(player.isLive() == true) {
+						srvrLiveProperty.set(1);
+						srvrLive = true;
+						System.out.println("srvrLive has changed, PlayerGUI");
+						stop = 1;
+					}
+					else {
+						srvrLiveProperty.set(0);
+						srvrLive = false;
+					}
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		srvrChange.start();
+	}
+	
+	public void addToRiver(String cardStr) {
+		river.addCard(cardStr);
+	}
+	
+	public void addToHand(String card) {
+		player.addCard(card);
+	}
+	
+	public void showRiver(int rnd) {
+		if(rnd == 0) {
+			riverNodes.get(0).setVisible(false);
+			riverNodes.get(1).setVisible(false);
+			riverNodes.get(2).setVisible(false);
+			riverNodes.get(3).setVisible(false);
+			riverNodes.get(4).setVisible(false);
+		}
+		else if(rnd == 1) {
+			riverNodes.get(0).setVisible(true);
+			riverNodes.get(1).setVisible(true);
+			riverNodes.get(2).setVisible(true);
+		}
+		else if(rnd == 2) {
+			riverNodes.get(0).setVisible(true);
+			riverNodes.get(1).setVisible(true);
+			riverNodes.get(2).setVisible(true);
+			riverNodes.get(3).setVisible(true);
+		}
+		else if(rnd == 3) {
+			riverNodes.get(0).setVisible(true);
+			riverNodes.get(1).setVisible(true);
+			riverNodes.get(2).setVisible(true);
+			riverNodes.get(3).setVisible(true);
+			riverNodes.get(4).setVisible(true);
+		}
+	}
+	
+	public void resetAll() {
+		player.resetHand();
+		river.resetCard();
+		player.setActive(true);
+		player.setStartBal(player.getBal());
+	}
+	
+	public void applyChange(String change) {
+	//	input = input.replace("\n", "");
+		System.out.println("Change received from ServerThread");
+		if(change.indexOf(";") != -1) {
+		String user = change.substring(0, change.indexOf(";")); // Get the username of who executed the action
+		String action = ""; // Get the action executed
+		String location = "";
+		String card = "";
+		int amount = 0; // If needed, bet amount storage
+		
+		
+		change = change.replace(user + ";", "");
+		if(change.indexOf(";") != -1) {
+				action = change.substring(0, change.indexOf(";"));
+				if(action.equalsIgnoreCase("high") && user.equals("all")) {
+					amount = Integer.parseInt(change.substring(change.indexOf(";") + 1));
+					highestBet = amount;
+				}
+				else if(action.equalsIgnoreCase("pot") && user.equals("all")) {
+					amount = Integer.parseInt(change.substring(change.indexOf(";") + 1));
+					potVal = amount;
+				}
+				else if(action.equalsIgnoreCase("addCard") && user.equals(player.getName())) {
+					change = change.replace(action + ";", "");
+					location = change.substring(0, change.indexOf(";"));
+				
+					if(location.equals("river")) {
+						card = location.substring(location.indexOf(";") + 1);
+						addToRiver(card);
+					}
+					else if(location.equals("hand")) {
+						card = location.substring(location.indexOf(";") + 1);
+						addToHand(card);
+					}
+				}
+				else if(action.equalsIgnoreCase("status") && user.equals("all")) {
+					String status = change.substring(change.indexOf(";") + 1);
+					if(status.equalsIgnoreCase("true")) {
+						srvrLive = true;
+					}
+					else {
+						srvrLive = false;
+					}
+				}
+				else if(action.equalsIgnoreCase("river") && user.equals("all")) {
+					location = change.substring(change.indexOf(";") + 1);
+				
+					if(location.equals("hide")) {
+						showRiver(0);
+					}
+					else if(location.equals("first3")) {
+						showRiver(1);
+					}
+					else if(location.equals("fourth")) {
+						showRiver(2);
+					}
+					else if(location.equals("fifth")) {
+						showRiver(3);
+					}
+				}
+				else if(action.equalsIgnoreCase("reset") && user.equals("all")) {
+					resetAll();
+				}
+			}
+			else {
+				action = change.substring(change.indexOf(";") + 1);
+			}
 		}
 	}
 	
@@ -386,6 +625,7 @@ public class PlayerGUI implements Runnable {
 			
 			if(wasSent == false) {
 				serverThread.addPlayer(player);
+				serverThread.addPlayerGUI(this);
 				wasSent = true;
 			}
 			// as long as the serverAccessThread is running (alive) the program will go through the loop
@@ -397,7 +637,6 @@ public class PlayerGUI implements Runnable {
 					// then empties the string to avoid overflow/overload
 					actions = "none";
 				}
-				updatePot();
 			}
 		} catch (IOException ex) {
 			// Catches an error that is caused by an unavailable host

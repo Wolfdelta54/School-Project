@@ -99,6 +99,11 @@ public class Card
 		return "Images/cards/" + fileName;
 	}
 	
+	public String change()
+	{
+		return (value % 10) + "," + (value / 10);
+	}
+	
 	public String toString()
 	{
 		return suit[value % 10] + rank[value / 10];

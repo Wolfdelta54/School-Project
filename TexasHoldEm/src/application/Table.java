@@ -9,17 +9,13 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingNode;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 
 public class Table implements Runnable /* extends Application */
 {
@@ -28,10 +24,10 @@ public class Table implements Runnable /* extends Application */
 	
 	private int serverPort;
 	public List<ClientThread> clients;
+	ArrayList<Boolean> hasMatched = new ArrayList<Boolean>(); // Used to determine if betting round has ended
 
 	private int pot = 0; // initializes pot to 0
 	private ArrayList<Player> players = new ArrayList<Player>(); // list of players and their attributes
-	private ArrayList<PlayerGUI> playersGUI = new ArrayList<PlayerGUI>();
 	private final River riverCards = new River();
 	private final DeckOfCards deck = new DeckOfCards();
 	private int port = 4444;
@@ -48,9 +44,15 @@ public class Table implements Runnable /* extends Application */
 	// Pane of components that will constantly change
 	public Group tablePane = new Group();
 	public GridPane riverPane = new GridPane();
-	public ArrayList<ImageView> riverImgs = new ArrayList<ImageView>(); // Stores the images for the river
+	public ArrayList<SwingNode> riverImgs = new ArrayList<SwingNode>(); // Stores the images for the river
 	public ArrayList<GridPane> handList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold the images of every player's cards
 	public ArrayList<GridPane> playerList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold all of the info for each player
+	
+	public String change = "none";
+	public boolean hasChange = false;
+	public ArrayList<String> changeStorage = new ArrayList<String>();
+	
+	public boolean srvrLive = false;
 	
 
 	public Table()
@@ -66,16 +68,34 @@ public class Table implements Runnable /* extends Application */
 		deck.shuffle();
 	}
 	
+	public boolean isLive() {
+		return srvrLive;
+	}
+	
+	public void setLive(boolean x) {
+		srvrLive = x;
+		System.out.println("Table > setLive");
+		sendStatus();
+	}
+	
 	public GridPane getIpPane() {
 		return ipPane;
 	}
 	
-	public Group getPane() {
+	public Label getIP() {
+		return ip;
+	}
+	
+	public Group getPlayerPane() {
 		return tablePane;
 	}
 	
 	public GridPane getRiverPane() {
-		return riverPane;
+		return riverCards.getPane();
+	}
+	
+	public int getNumPlayers() {
+		return players.size();
 	}
 	
 	public void setRiverPane() {
@@ -84,6 +104,7 @@ public class Table implements Runnable /* extends Application */
 	
 	public void addPlayer(Player player) {
 		players.add(player);
+		System.out.println(player);
 	}
 	
 	public void removePlayer(Player player) {
@@ -117,7 +138,9 @@ public class Table implements Runnable /* extends Application */
 		{
 			for(int j = 0; j < players.size(); j++)
 			{
-				players.get(j).addCard(deck.nextCard()); // adds a card to the player's deck
+				Card nextCrd = deck.nextCard();
+				players.get(j).addCard(nextCrd); // adds a card to the player's deck
+				change = players.get(j).getName() + ";addCard;hand;" + nextCrd.change();
 			}
 
 		}
@@ -125,8 +148,18 @@ public class Table implements Runnable /* extends Application */
 		
 		for(int i = 0; i < 5; i++)
 		{
-			riverCards.addCard(deck.nextCard()); // adds 5 cards to the river	
+			for(int j = 0; j < players.size(); j++) {
+				Card nextCrd = deck.nextCard();
+				riverCards.addCard(nextCrd); // adds 5 cards to the river
+				change = players.get(j).getName() + ";addCard;river;" + nextCrd.change();
+			}
 		}
+		
+		for(int i = 0; i < players.size(); i++) {
+			change = players.get(i).getName() + "river;fifth";
+		}
+		riverCards.updateImgs();
+		riverImgs = riverCards.getCardNodes();
 		deck.shuffle();
 	}
 	
@@ -146,9 +179,11 @@ public class Table implements Runnable /* extends Application */
 		else {
 			action = input.substring(input.indexOf(";") + 1);
 		}
+		ArrayList<String> names = new ArrayList<String>();
 		
 		// Go through the list of players looking for the one who's username matches that of the executor
 		for(int i = 0; i < players.size(); i++) {
+			names.add(players.get(i).getName());
 			if(user.equals(players.get(i).getName())) {
 				// Set active to false if the action was Fold
 				if(action.equalsIgnoreCase("Fold")) {
@@ -156,8 +191,13 @@ public class Table implements Runnable /* extends Application */
 				}
 				// Update balance of the executor and update the current bet
 				else if(action.equalsIgnoreCase("Bet") || action.equalsIgnoreCase("Raise") || action.equalsIgnoreCase("Call")) {
-					players.get(i).updateBal(-amount);
-					pot += amount;
+					pot = pot + amount;
+					players.get(i).updateBal(0 - amount);
+					
+					if(amount > highBet) {
+						highBet = amount;
+						change = "all;high;" + amount;
+					}
 					
 					for(int j = 0; j < players.size(); j++) {
 						players.get(j).setCurBet(amount);
@@ -166,6 +206,7 @@ public class Table implements Runnable /* extends Application */
 						System.out.println("Current Bet (Table) " + amount);
 					}
 					System.out.println(players.get(i) + " Table");
+					change = "all;pot;" + pot;
 				}
 				// Do nothing
 				else if(action.equalsIgnoreCase("Check")) {
@@ -173,6 +214,97 @@ public class Table implements Runnable /* extends Application */
 				}
 			}
 		}
+		
+		if(!names.contains(user)) {
+			addPlayer(new Player(user));
+			System.out.println(players.size());
+		}
+	}
+	
+	public void prntPlayers() {
+		for(int i = 0; i < players.size(); i++) {
+			System.out.println(players.get(i));
+		}
+	}
+	
+	public void sendStatus() {
+		for(int i = 0; i < players.size(); i++) {
+			players.get(i).setLive(srvrLive);
+		}
+		change = "all;status;" + srvrLive;
+	}
+	
+	public void checkRndEnd() {
+		
+		while(hasMatched.size() < players.size()) {
+			hasMatched.add(false);
+		}
+		
+		for(int i = 0; i < players.size(); i++) {
+			if(players.get(i).getActive() == false || players.get(i).getAllIn() == true || players.get(i).getRndBet() == highBet) {
+				hasMatched.set(i, true);
+			}
+			else {
+				hasMatched.set(i, false);
+			}
+		}
+		
+		if(hasMatched.contains(false) == false) {
+			curRnd++;
+			if(curRnd > 3) {
+				nextHand();
+			}
+			else {
+				showRiver(curRnd);
+			}
+		}
+	}
+	
+	public void nextHand() {
+		curRnd = 0;
+		
+		for(int i = 0; i < players.size(); i++) {
+			players.get(i).setActive(true);
+			players.get(i).setCurrent(false);
+			players.get(i).setStartBal(players.get(i).getBal());
+		}
+		showRiver(0);
+		resetCards();
+		deal();
+	}
+	
+	public void showRiver(int rnd) {
+		if(rnd == 0) {
+		//	riverImgs.get(0).setVisible(false);
+		//	riverImgs.get(1).setVisible(false);
+		//	riverImgs.get(2).setVisible(false);
+		//	riverImgs.get(3).setVisible(false);
+		//	riverImgs.get(4).setVisible(false);
+			change = "all;river;hide";
+		}
+		else if(rnd == 1) {
+		//	riverImgs.get(0).setVisible(true);
+		//	riverImgs.get(1).setVisible(true);
+		//	riverImgs.get(2).setVisible(true);
+			change = "all;river;first3";
+		}
+		else if(rnd == 2) {
+		//	riverImgs.get(3).setVisible(true);	
+			change = "all;river;fourth";
+		}
+		else if(rnd == 3) {
+		//	riverImgs.get(4).setVisible(true);
+			change = "all;river;fifth";
+		}
+	}
+	
+	public void resetCards() {
+		riverCards.resetCard();
+		
+		for(int i = 0; i < players.size(); i++) {
+			players.get(i).resetHand();
+		}
+		change = "all;reset";
 	}
 	
 	public List<ClientThread> getClients() {
@@ -181,6 +313,14 @@ public class Table implements Runnable /* extends Application */
 	
 	public void setPort(int num) {
 		portNumber = num;
+	}
+	
+	public String getChange() {
+		return change;
+	}
+	
+	public void setChange(String chn) {
+		change = chn;
 	}
 	
 	@Override
@@ -213,12 +353,37 @@ public class Table implements Runnable /* extends Application */
 		while(true) {
 			try {
 				Socket socket = serverSocket.accept();
-				System.out.println("User: " + " has connected");
+				System.out.println("A new user has connected");
 				System.out.println("From: " + socket.getRemoteSocketAddress());
+				checkRndEnd();
 				ClientThread client = new ClientThread(this, socket);
 				Thread thread = new Thread(client);
 				thread.start();
+				Thread update = new Thread(new Runnable() {
+					public void run() {
+						while(thread.isAlive()) {
+							// if actions is not empty than it will send the info
+							if(!change.equalsIgnoreCase("none")) {
+								// sends the info
+								client.addNextChange(change);
+								// then empties the string to avoid overflow/overload
+								change = "none";
+								hasChange = true;
+							}
+						}
+					}
+				});
+				boolean hasNext = hasChange;
+				if(hasNext == true) {
+					// sends the info
+					String message = change;
+					client.addNextChange(message);
+					// then empties the string to avoid overflow/overload
+					change = "none";
+				}
+				update.start();
 				clients.add(client);
+				System.out.println(players.size());
 			} catch (IOException ex) {
 				System.out.println("User: " + " has failed to connect");
 			}

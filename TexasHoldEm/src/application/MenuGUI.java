@@ -5,10 +5,13 @@ import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.swing.JLabel;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -19,6 +22,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -47,6 +52,23 @@ public class MenuGUI extends Application {
 	public GridPane serverPane = new GridPane();
 	public TextField server = new TextField();
 	public Label serverLabel = new Label("Server IP:");
+	
+	// Pane of components for the wait screen, shown only to hosts when server is started, requires at least 2 players to move on
+	public Group waitPane = new Group();
+	public Label info = new Label("2 players are required");
+	public Label numPlayers = new Label();
+	public Button start = new Button("Start");
+	ImageView waitPaneBG = new ImageView();
+	
+	public PlayerGUI play; // Stores the PlayerGUI pane while the server is waiting to start the game
+	
+	// Client wait pane
+	public boolean srvrLive = false;
+	public Group clWaitPane = new Group();
+	public Label clInfo = new Label("Please wait");
+	ImageView clWaitPaneBG = new ImageView();
+	
+	Table table = new Table(4444);
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -89,6 +111,8 @@ public class MenuGUI extends Application {
         mainMenu.getChildren().add(menuBG);
         mainMenu.getChildren().add(mainMenuOptions);
         
+        setUpWait();
+        
         scene = new Scene(mainMenu, 300, 250);
         
         // Add style sheet to Scene
@@ -105,6 +129,31 @@ public class MenuGUI extends Application {
         		System.exit(0);
         	}
         });
+	}
+	
+	public void setUpWait() {		
+		start.setTranslateX(125);
+		start.setTranslateY(175);
+		
+		info.setTranslateX(125);
+		info.setTranslateY(125);
+		info.setFont(new Font(15));
+		info.setTextFill(Paint.valueOf("WHITE"));
+		
+		clInfo.setTranslateX(25);
+		clInfo.setTranslateY(25);
+		clInfo.setFont(new Font(15));
+		clInfo.setTextFill(Paint.valueOf("WHITE"));
+		
+		waitPaneBG.setTranslateY(15);
+		
+		waitPane.getChildren().add(waitPaneBG);
+		waitPane.getChildren().add(start);
+		waitPane.getChildren().add(info);
+		waitPane.getChildren().add(table.getIpPane());
+		
+		clWaitPane.getChildren().add(clWaitPaneBG);
+		clWaitPane.getChildren().add(clInfo);
 	}
 	
 	public static void main(String[] args) {
@@ -142,17 +191,86 @@ public class MenuGUI extends Application {
 			}
 			else {
 				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+				table.addPlayer(play.getPlayer());
 				play.sendJoin();
+				
 				Thread playStart = new Thread(play);
 				playStart.start();
-				gameScene = play.getScene();
-				primaryStage.setScene(gameScene);
+				JLabel status = new JLabel();
+				status.setText(play.isLive() + "");
+				
+				if(table.isLive() == false) {
+					Scene wait = new Scene(clWaitPane, 300, 250);
+					primaryStage.setScene(wait);
+					
+					Task<Void> waitTask = new Task<Void>() {
+						@Override
+						public Void call() {
+							int stop = 0;
+							while(stop == 0) {
+								if(play.isLive() == true) {
+									System.out.println("srvrLive has changed, MenuGUI");
+									play.addHand();
+									
+									GridPane river = table.getRiverPane();
+									river.setTranslateX(312);
+									river.setTranslateY(180);
+									
+									play.getPane().getChildren().add(river);
+					
+									gameScene = play.getScene();
+									primaryStage.setScene(gameScene);
+										
+									stop = 1;
+								}
+								else {
+									stop = 0;
+								}
+							}
+							return null;
+						}
+					};
+					new Thread(waitTask).start();
+				}
+				else {
+					play.addHand();
+				
+					GridPane river = table.getRiverPane();
+					river.setTranslateX(312);
+					river.setTranslateY(180);
+
+					play.getPane().getChildren().add(river);
+
+					gameScene = play.getScene();
+					primaryStage.setScene(gameScene);
+				}
 			}
 		});
 		
 		host.setOnAction(event -> {
-			Table table = new Table(4444);
 			Thread srvStart = new Thread(table);
+			srvStart.start();
+			
+			String ipStorage = "0.0.0.0";
+		
+			try {
+				InetAddress ipAddr = InetAddress.getLocalHost();
+				ipStorage = ipAddr.getHostAddress();
+			} catch (UnknownHostException ex) {
+				ex.printStackTrace();
+			}
+		
+			play = new PlayerGUI(user.getText(), ipStorage, 4444);
+			table.addPlayer(play.getPlayer());
+			table.prntPlayers();
+			play.prntPlayer();
+			play.sendJoin();
+			
+			Thread playStart = new Thread(play);
+			playStart.start();
+			Scene wait = new Scene(waitPane, 300, 250);
+			primaryStage.setScene(wait);
+		/*	Thread srvStart = new Thread(table);
 			srvStart.start();
 			
 			String ipStorage = "0.0.0.0";
@@ -169,6 +287,12 @@ public class MenuGUI extends Application {
 			table.deal();
 			play.addHand();
 			play.sendJoin();
+			
+			GridPane river = table.getRiverPane();
+			river.setTranslateX(312);
+			river.setTranslateY(180);
+			
+			play.getPane().getChildren().add(river);
 			Thread playStart = new Thread(play);
 			playStart.start();
 			BorderPane pane = new BorderPane();
@@ -178,16 +302,70 @@ public class MenuGUI extends Application {
 			pane.setCenter(play.getPane());
 			pane.setTop(table.getIpPane());
 			gameScene = new Scene(pane, 1000, 750);
-			primaryStage.setScene(gameScene);
+			primaryStage.setScene(gameScene); */
+		});
+		
+		start.setOnAction(event -> {
+			if(table.getNumPlayers() > 1) {
+				System.out.println("MenuGUI > addListeners");
+				table.setLive(true);
+			
+		/*		String ipStorage = "0.0.0.0";
+			
+				try {
+					InetAddress ipAddr = InetAddress.getLocalHost();
+					ipStorage = ipAddr.getHostAddress();
+				} catch (UnknownHostException ex) {
+					ex.printStackTrace();
+				}
+			
+				PlayerGUI play = new PlayerGUI(user.getText(), ipStorage, 4444);
+				table.addPlayer(play.getPlayer());
+				table.deal();
+				play.addHand();
+				play.sendJoin();
+			
+				GridPane river = table.getRiverPane();
+				river.setTranslateX(312);
+				river.setTranslateY(180);
+			
+				play.getPane().getChildren().add(river);
+				Thread playStart = new Thread(play);
+				playStart.start(); */
+				table.deal();
+				play.addHand();
+				table.prntPlayers();
+				play.prntPlayer();
+				
+		//		GridPane river = table.getRiverPane();
+		//		river.setTranslateX(312);
+		//		river.setTranslateY(180);
+			
+		//		play.getPane().getChildren().add(river);
+				BorderPane pane = new BorderPane();
+			//	table.getPotLbl().setTranslateX(450);
+			//	table.getPotLbl().setTranslateY(300);
+			//	play.getPane().getChildren().add(table.getPotLbl());
+				pane.setCenter(play.getPane());
+				pane.setTop(table.getIpPane());
+				gameScene = new Scene(pane, 1000, 750);
+				primaryStage.setScene(gameScene);
+			}
 		});
 	}
 	
 	// Sets the image file for the menu's background
 	public void addImages() {
 		FileInputStream mimg;
+		FileInputStream mimg2;
+		FileInputStream mimg3;
 		try {
 			mimg = new FileInputStream("Images/darkGreenCloth.jpg");
+			mimg2 = new FileInputStream("Images/darkGreenCloth.jpg"); // To avoid a white screen when there should be a background
+			mimg3 = new FileInputStream("Images/darkGreenCloth.jpg"); // Same as above
 			menuBG.setImage(new Image(mimg));
+			waitPaneBG.setImage(new Image(mimg2));
+			clWaitPaneBG.setImage(new Image(mimg3));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
