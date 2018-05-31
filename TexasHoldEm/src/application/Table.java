@@ -383,6 +383,7 @@ public class Table implements Runnable /* extends Application */
 				
 				if(hasChange == true) {
 					sendChange(client, change);
+					hasChange = false;
 				}
 				
 				clients.add(client);
