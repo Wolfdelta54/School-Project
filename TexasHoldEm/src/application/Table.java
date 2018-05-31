@@ -141,6 +141,7 @@ public class Table implements Runnable /* extends Application */
 				Card nextCrd = deck.nextCard();
 				players.get(j).addCard(nextCrd); // adds a card to the player's deck
 				change = players.get(j).getName() + ";addCard;hand;" + nextCrd.change();
+				System.out.println(change);
 			}
 
 		}
@@ -152,11 +153,12 @@ public class Table implements Runnable /* extends Application */
 				Card nextCrd = deck.nextCard();
 				riverCards.addCard(nextCrd); // adds 5 cards to the river
 				change = players.get(j).getName() + ";addCard;river;" + nextCrd.change();
+				System.out.println(change);
 			}
 		}
 		
 		for(int i = 0; i < players.size(); i++) {
-			change = players.get(i).getName() + "river;fifth";
+			change = players.get(i).getName() + ";river;fifth";
 		}
 		riverCards.updateImgs();
 		riverImgs = riverCards.getCardNodes();
@@ -323,6 +325,10 @@ public class Table implements Runnable /* extends Application */
 		change = chn;
 	}
 	
+	public void sendChange(ClientThread client, String message) {
+		client.addNextChange(message);
+	}
+	
 	@Override
 	public void run() {
 		clients = new ArrayList<ClientThread>();
@@ -373,15 +379,12 @@ public class Table implements Runnable /* extends Application */
 						}
 					}
 				});
-				boolean hasNext = hasChange;
-				if(hasNext == true) {
-					// sends the info
-					String message = change;
-					client.addNextChange(message);
-					// then empties the string to avoid overflow/overload
-					change = "none";
-				}
 				update.start();
+				
+				if(hasChange == true) {
+					sendChange(client, change);
+				}
+				
 				clients.add(client);
 				System.out.println(players.size());
 			} catch (IOException ex) {
