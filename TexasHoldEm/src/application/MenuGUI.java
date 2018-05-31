@@ -205,7 +205,33 @@ public class MenuGUI extends Application {
 					primaryStage.setScene(wait);
 					AtomicInteger count = new AtomicInteger(-1);
 					
-					play.srvrLiveProperty.addListener(new ChangeListener<Number>() {
+					Thread waitThrd = new Thread(new Runnable() {
+						public void run() {
+							int stop = 0;
+							while(stop == 0) {
+								if(play.isLive() == true) {
+									System.out.println("srvrLive has changed, MenuGUI");
+									count.set(0);
+									play.addHand();
+									
+									GridPane river = table.getRiverPane();
+									river.setTranslateX(312);
+									river.setTranslateY(180);
+					
+									play.getPane().getChildren().add(river);
+					
+									gameScene = play.getScene();
+									primaryStage.setScene(gameScene);
+									stop = 1;
+								}
+								else {
+									stop = 0;
+								}
+							}
+						}
+					});
+					
+			/*		play.srvrLiveProperty.addListener(new ChangeListener<Number>() {
 						@Override
 						public void changed(final ObservableValue<? extends Number> observable, final Number oldVal, final Number newVal) {
 							System.out.println("srvrLive has changed, MenuGUI");
@@ -235,7 +261,7 @@ public class MenuGUI extends Application {
 								}
 							}
 						}
-					});
+					}); */
 				/*	test.textProperty().addListener(new ChangeListener<String>() {
 						@Override
 						public void changed(final ObservableValue<? extends String> observable, final String oldVal, final String newVal) {
