@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.LinkedList;
 
 public class ClientThread implements Runnable
 {
@@ -13,9 +15,13 @@ public class ClientThread implements Runnable
 	private OutputStreamWriter clientOut;
 	private Table table;
 	private Player player;
+	private final LinkedList<String> changesToSend; // Used to store the players actions
+	private boolean hasMessages = false; // Stores actionsToSend.isEmpty()
+	private String change;
 	
 	public ClientThread(Table table, Socket socket)
 	{
+		changesToSend = new LinkedList<String>();
 		this.table = table;
 		this.socket = socket;
 	}
@@ -25,12 +31,22 @@ public class ClientThread implements Runnable
 		return clientOut;
 	}
 	
+	public void addNextChange(String change) {
+		synchronized (changesToSend) {
+			hasMessages = true;
+			changesToSend.push(change);
+			this.change = change;
+			System.out.println("Change sent to ServerThreads");
+		}
+	}
+	
 	@Override
 	public void run()
 	{
 		try {
 			// setup
-			this.clientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+	//		this.clientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+	//		OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
 			@SuppressWarnings("resource")
 	//		Scanner in = new Scanner(socket.getInputStream()).useDelimiter("\\A");
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -55,7 +71,27 @@ public class ClientThread implements Runnable
 							thatClientOut.flush();
 						}
 					} */
+					 
 					this.table.doAction(input);
+				}
+				if(hasMessages)
+				{
+					String nextSend = "";
+				//	OutputStreamWriter thatClientOut = this.table.getClients().get(this.table.getClients().indexOf(this)).getWriter();
+				//	OutputStreamWriter thatClientOut = this.getWriter();
+					OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+					
+					synchronized(changesToSend) {
+						// determines if the player as done anything
+						 nextSend = changesToSend.pop();
+						 hasMessages = !changesToSend.isEmpty();
+						 System.out.println(nextSend);
+					}
+					// Prints the other players' actions to the client's terminal
+					thatClientOut.write(nextSend + "\n");
+					thatClientOut.flush();
+					
+					thatClientOut.close();
 				}
 			}
 			System.out.println("While loop as been closed");

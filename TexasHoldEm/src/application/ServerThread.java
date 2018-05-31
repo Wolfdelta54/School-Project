@@ -52,20 +52,20 @@ public class ServerThread implements Runnable
 			OutputStreamWriter serverOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8"); // Creates a new printwriter from the socket's output stream
 			InputStream serverInStream = socket.getInputStream(); // Creates a new input stream to send action messages to the server
 			@SuppressWarnings("resource")
-			Scanner serverIn = new Scanner(serverInStream); // Creates a new scanner that will store the actions until they are sent to the server
+			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Creates a bufferedreader that will store the actions until they are sent to the server
 			// BufferedReader userBr = new BufferedReader(new InputStreamReader(userInStream);
 			// Scanner userIn = new Scanner(userInStream);
 			
 			// A loop that runs while the player is connected to a server
 			while(!socket.isClosed())
 			{
-				if(serverInStream.available() > 0)
+				if(in.ready())
 				{
-					if(serverIn.hasNextLine())
-					{
-						// Prints the player's action to the client's terminal
-						System.out.println(serverIn.nextLine());
-					}
+					// Prints the player's action to the client's terminal
+					String change = in.readLine().replace("\n", "");
+					System.out.println(change);
+					System.out.println("Change received from ClientThread and sent to GUI");
+					this.gui.applyChange(change);
 				}
 				if(hasMessages)
 				{

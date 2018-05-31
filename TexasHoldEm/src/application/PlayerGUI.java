@@ -1,11 +1,14 @@
 package application;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import javafx.beans.property.IntegerProperty;
@@ -18,7 +21,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -48,6 +50,7 @@ public class PlayerGUI implements Runnable {
 	public int potVal = 0;
 	public int rndBet = 0;
 	public boolean isAllIn;
+	public int highestBet = 0;
 	
 	public boolean wasSent = false;
 	
@@ -57,6 +60,14 @@ public class PlayerGUI implements Runnable {
 	public Scene scene;
 	public boolean srvrLive = false;
 	public IntegerProperty srvrLiveProperty = new SimpleIntegerProperty(0);
+	
+	// River GUI components
+	public GridPane riverPane = new GridPane();
+	public ArrayList<SwingNode> riverNodes = new ArrayList<SwingNode>();
+	public ArrayList<ImageIcon> riverIcons = new ArrayList<ImageIcon>();
+	public ArrayList<String> riverCards = new ArrayList<String>();
+	
+	public River river = new River();
 	
 /*	public static void main(String args[]) {
 		launch(args);
@@ -69,6 +80,10 @@ public class PlayerGUI implements Runnable {
         addImages();
         setUpBtns();
         potAutoUpdate();
+        
+        riverPane = river.getPane();
+        riverNodes = river.getCardNodes();
+        riverIcons = river.getCardList();
         
         srvrLiveProperty.set(0);
         
@@ -100,6 +115,13 @@ public class PlayerGUI implements Runnable {
         addImages();
         setUpBtns();
         
+        riverPane = river.getPane();
+        riverNodes = river.getCardNodes();
+        riverIcons = river.getCardList();
+        
+		riverPane.setTranslateX(312);
+		riverPane.setTranslateY(180);
+        
         // Set balance label text
         balance.setText("$" + player.getBal());
         
@@ -123,6 +145,7 @@ public class PlayerGUI implements Runnable {
         gameStage.getChildren().add(tableImage);
         gameStage.getChildren().add(gameActions);
 		gameStage.getChildren().add(sNode);
+		gameStage.getChildren().add(riverPane);
         
         scene = new Scene(gameStage, 1000, 700);
         scene.getStylesheets().add("application/PlayerGUI.css");
@@ -316,8 +339,8 @@ public class PlayerGUI implements Runnable {
 		try {
 			timg = new FileInputStream("Images/AdobeStock_15009121Poker.png");
 			bgimg = new FileInputStream("Images/woodTexture.jpg");
-			tableImage.setImage(new Image(timg));
-			bgImage.setImage(new Image(bgimg));
+			tableImage.setImage(new javafx.scene.image.Image(timg));
+			bgImage.setImage(new javafx.scene.image.Image(bgimg));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -441,6 +464,119 @@ public class PlayerGUI implements Runnable {
 		srvrChange.start();
 	}
 	
+	public void addToRiver(String cardStr) {
+		river.addCard(cardStr);
+	}
+	
+	public void addToHand(String card) {
+		player.addCard(card);
+	}
+	
+	public void showRiver(int rnd) {
+		if(rnd == 0) {
+			riverNodes.get(0).setVisible(false);
+			riverNodes.get(1).setVisible(false);
+			riverNodes.get(2).setVisible(false);
+			riverNodes.get(3).setVisible(false);
+			riverNodes.get(4).setVisible(false);
+		}
+		else if(rnd == 1) {
+			riverNodes.get(0).setVisible(true);
+			riverNodes.get(1).setVisible(true);
+			riverNodes.get(2).setVisible(true);
+		}
+		else if(rnd == 2) {
+			riverNodes.get(0).setVisible(true);
+			riverNodes.get(1).setVisible(true);
+			riverNodes.get(2).setVisible(true);
+			riverNodes.get(3).setVisible(true);
+		}
+		else if(rnd == 3) {
+			riverNodes.get(0).setVisible(true);
+			riverNodes.get(1).setVisible(true);
+			riverNodes.get(2).setVisible(true);
+			riverNodes.get(3).setVisible(true);
+			riverNodes.get(4).setVisible(true);
+		}
+	}
+	
+	public void resetAll() {
+		player.resetHand();
+		river.resetCard();
+		player.setActive(true);
+		player.setStartBal(player.getBal());
+	}
+	
+	public void applyChange(String change) {
+	//	input = input.replace("\n", "");
+		System.out.println("Change received from ServerThread");
+		if(change.indexOf(";") != -1) {
+		String user = change.substring(0, change.indexOf(";")); // Get the username of who executed the action
+		String action = ""; // Get the action executed
+		String location = "";
+		String card = "";
+		int amount = 0; // If needed, bet amount storage
+		
+		
+		change = change.replace(user + ";", "");
+		if(change.indexOf(";") != -1) {
+				action = change.substring(0, change.indexOf(";"));
+				if(action.equalsIgnoreCase("high") && user.equals("all")) {
+					amount = Integer.parseInt(change.substring(change.indexOf(";") + 1));
+					highestBet = amount;
+				}
+				else if(action.equalsIgnoreCase("pot") && user.equals("all")) {
+					amount = Integer.parseInt(change.substring(change.indexOf(";") + 1));
+					potVal = amount;
+				}
+				else if(action.equalsIgnoreCase("addCard") && user.equals(player.getName())) {
+					change = change.replace(action + ";", "");
+					location = change.substring(0, change.indexOf(";"));
+				
+					if(location.equals("river")) {
+						card = location.substring(location.indexOf(";") + 1);
+						addToRiver(card);
+					}
+					else if(location.equals("hand")) {
+						card = location.substring(location.indexOf(";") + 1);
+						addToHand(card);
+					}
+				}
+				else if(action.equalsIgnoreCase("status") && user.equals("all")) {
+					String status = change.substring(change.indexOf(";") + 1);
+					if(status.equalsIgnoreCase("true")) {
+						srvrLive = true;
+					}
+					else {
+						srvrLive = false;
+					}
+				}
+				else if(action.equalsIgnoreCase("river") && user.equals("all")) {
+					location = change.substring(change.indexOf(";") + 1);
+				
+					if(location.equals("hide")) {
+						showRiver(0);
+					}
+					else if(location.equals("first3")) {
+						showRiver(1);
+					}
+					else if(location.equals("fourth")) {
+						showRiver(2);
+					}
+					else if(location.equals("fifth")) {
+						showRiver(3);
+					}
+				}
+				else if(action.equalsIgnoreCase("reset") && user.equals("all")) {
+					resetAll();
+				}
+			}
+			else {
+				action = change.substring(change.indexOf(";") + 1);
+			}
+		}
+	}
+	
 	public void updateBtns() {
 		// Removes the Call and Raise buttons (if present) and adds the Check and Bet buttons
 		if(curBet == 0) {
@@ -489,6 +625,7 @@ public class PlayerGUI implements Runnable {
 			
 			if(wasSent == false) {
 				serverThread.addPlayer(player);
+				serverThread.addPlayerGUI(this);
 				wasSent = true;
 			}
 			// as long as the serverAccessThread is running (alive) the program will go through the loop

@@ -231,108 +231,6 @@ public class MenuGUI extends Application {
 						}
 					};
 					new Thread(waitTask).start();
-					
-				/*	Thread waitThrd = new Thread(new Runnable() {
-						public void run() {
-							int stop = 0;
-							while(stop == 0) {
-								if(play.isLive() == true) {
-									Platform.runLater(new Runnable() {
-										public void run() {
-											System.out.println("srvrLive has changed, MenuGUI");
-											play.addHand();
-									
-											GridPane river = table.getRiverPane();
-											river.setTranslateX(312);
-											river.setTranslateY(180);
-									
-											play.getPane().getChildren().add(river);
-					
-											gameScene = play.getScene();
-											primaryStage.setScene(gameScene);
-										}
-									});
-									stop = 1;
-								}
-								else {
-									stop = 0;
-								}
-							}
-						}
-					});
-					waitThrd.start(); */
-					
-			/*		play.srvrLiveProperty.addListener(new ChangeListener<Number>() {
-						@Override
-						public void changed(final ObservableValue<? extends Number> observable, final Number oldVal, final Number newVal) {
-							System.out.println("srvrLive has changed, MenuGUI");
-							if(count.getAndSet(newVal.intValue()) == -1) {
-								if(play.isLive() == true) {
-								Platform.runLater(new Runnable() {
-									@Override
-									public void run() {
-											System.out.println("Hello");
-											count.set(0);
-											play.addHand();
-											
-											GridPane river = table.getRiverPane();
-											river.setTranslateX(312);
-											river.setTranslateY(180);
-							
-											play.getPane().getChildren().add(river);
-							
-											gameScene = play.getScene();
-											primaryStage.setScene(gameScene);
-										}
-									});
-								}
-								else {
-									System.out.println("Goodbye");
-									int val = count.getAndSet(-1);
-								}
-							}
-						}
-					}); */
-				/*	test.textProperty().addListener(new ChangeListener<String>() {
-						@Override
-						public void changed(final ObservableValue<? extends String> observable, final String oldVal, final String newVal) {
-							if(newVal.equals("true")) {
-								System.out.println(test.getText());
-										play.addHand();
-										
-										GridPane river = table.getRiverPane();
-										river.setTranslateX(312);
-										river.setTranslateY(180);
-						
-										play.getPane().getChildren().add(river);
-						
-										gameScene = play.getScene();
-										primaryStage.setScene(gameScene);
-							}
-							
-						}
-					}); */
-					
-				/*	Thread waitThread = new Thread(new Runnable() {
-						public void run() {
-							while(play.isLive() == false) {
-								// do nothing
-							}
-							if(play.isLive() == true) {
-								play.addHand();
-				
-								GridPane river = table.getRiverPane();
-								river.setTranslateX(312);
-								river.setTranslateY(180);
-				
-								play.getPane().getChildren().add(river);
-				
-								gameScene = play.getScene();
-								primaryStage.setScene(gameScene);
-							}
-						}
-					});
-					waitThread.start(); */
 				}
 				else {
 					play.addHand();
@@ -439,11 +337,11 @@ public class MenuGUI extends Application {
 				table.prntPlayers();
 				play.prntPlayer();
 				
-				GridPane river = table.getRiverPane();
-				river.setTranslateX(312);
-				river.setTranslateY(180);
+		//		GridPane river = table.getRiverPane();
+		//		river.setTranslateX(312);
+		//		river.setTranslateY(180);
 			
-				play.getPane().getChildren().add(river);
+		//		play.getPane().getChildren().add(river);
 				BorderPane pane = new BorderPane();
 			//	table.getPotLbl().setTranslateX(450);
 			//	table.getPotLbl().setTranslateY(300);

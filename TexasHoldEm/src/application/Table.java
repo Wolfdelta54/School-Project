@@ -48,6 +48,10 @@ public class Table implements Runnable /* extends Application */
 	public ArrayList<GridPane> handList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold the images of every player's cards
 	public ArrayList<GridPane> playerList = new ArrayList<GridPane>(); // Stores the GridPanes used to hold all of the info for each player
 	
+	public String change = "none";
+	public boolean hasChange = false;
+	public ArrayList<String> changeStorage = new ArrayList<String>();
+	
 	public boolean srvrLive = false;
 	
 
@@ -134,7 +138,9 @@ public class Table implements Runnable /* extends Application */
 		{
 			for(int j = 0; j < players.size(); j++)
 			{
-				players.get(j).addCard(deck.nextCard()); // adds a card to the player's deck
+				Card nextCrd = deck.nextCard();
+				players.get(j).addCard(nextCrd); // adds a card to the player's deck
+				change = players.get(j).getName() + ";addCard;hand;" + nextCrd.change();
 			}
 
 		}
@@ -142,7 +148,15 @@ public class Table implements Runnable /* extends Application */
 		
 		for(int i = 0; i < 5; i++)
 		{
-			riverCards.addCard(deck.nextCard()); // adds 5 cards to the river	
+			for(int j = 0; j < players.size(); j++) {
+				Card nextCrd = deck.nextCard();
+				riverCards.addCard(nextCrd); // adds 5 cards to the river
+				change = players.get(j).getName() + ";addCard;river;" + nextCrd.change();
+			}
+		}
+		
+		for(int i = 0; i < players.size(); i++) {
+			change = players.get(i).getName() + "river;fifth";
 		}
 		riverCards.updateImgs();
 		riverImgs = riverCards.getCardNodes();
@@ -182,6 +196,7 @@ public class Table implements Runnable /* extends Application */
 					
 					if(amount > highBet) {
 						highBet = amount;
+						change = "all;high;" + amount;
 					}
 					
 					for(int j = 0; j < players.size(); j++) {
@@ -191,6 +206,7 @@ public class Table implements Runnable /* extends Application */
 						System.out.println("Current Bet (Table) " + amount);
 					}
 					System.out.println(players.get(i) + " Table");
+					change = "all;pot;" + pot;
 				}
 				// Do nothing
 				else if(action.equalsIgnoreCase("Check")) {
@@ -215,6 +231,7 @@ public class Table implements Runnable /* extends Application */
 		for(int i = 0; i < players.size(); i++) {
 			players.get(i).setLive(srvrLive);
 		}
+		change = "all;status;" + srvrLive;
 	}
 	
 	public void checkRndEnd() {
@@ -258,22 +275,26 @@ public class Table implements Runnable /* extends Application */
 	
 	public void showRiver(int rnd) {
 		if(rnd == 0) {
-			riverImgs.get(0).setVisible(false);
-			riverImgs.get(1).setVisible(false);
-			riverImgs.get(2).setVisible(false);
-			riverImgs.get(3).setVisible(false);
-			riverImgs.get(4).setVisible(false);
+		//	riverImgs.get(0).setVisible(false);
+		//	riverImgs.get(1).setVisible(false);
+		//	riverImgs.get(2).setVisible(false);
+		//	riverImgs.get(3).setVisible(false);
+		//	riverImgs.get(4).setVisible(false);
+			change = "all;river;hide";
 		}
 		else if(rnd == 1) {
-			riverImgs.get(0).setVisible(true);
-			riverImgs.get(1).setVisible(true);
-			riverImgs.get(2).setVisible(true);
+		//	riverImgs.get(0).setVisible(true);
+		//	riverImgs.get(1).setVisible(true);
+		//	riverImgs.get(2).setVisible(true);
+			change = "all;river;first3";
 		}
 		else if(rnd == 2) {
-			riverImgs.get(3).setVisible(true);			
+		//	riverImgs.get(3).setVisible(true);	
+			change = "all;river;fourth";
 		}
 		else if(rnd == 3) {
-			riverImgs.get(4).setVisible(true);
+		//	riverImgs.get(4).setVisible(true);
+			change = "all;river;fifth";
 		}
 	}
 	
@@ -283,6 +304,7 @@ public class Table implements Runnable /* extends Application */
 		for(int i = 0; i < players.size(); i++) {
 			players.get(i).resetHand();
 		}
+		change = "all;reset";
 	}
 	
 	public List<ClientThread> getClients() {
@@ -291,6 +313,14 @@ public class Table implements Runnable /* extends Application */
 	
 	public void setPort(int num) {
 		portNumber = num;
+	}
+	
+	public String getChange() {
+		return change;
+	}
+	
+	public void setChange(String chn) {
+		change = chn;
 	}
 	
 	@Override
@@ -329,6 +359,29 @@ public class Table implements Runnable /* extends Application */
 				ClientThread client = new ClientThread(this, socket);
 				Thread thread = new Thread(client);
 				thread.start();
+				Thread update = new Thread(new Runnable() {
+					public void run() {
+						while(thread.isAlive()) {
+							// if actions is not empty than it will send the info
+							if(!change.equalsIgnoreCase("none")) {
+								// sends the info
+								client.addNextChange(change);
+								// then empties the string to avoid overflow/overload
+								change = "none";
+								hasChange = true;
+							}
+						}
+					}
+				});
+				boolean hasNext = hasChange;
+				if(hasNext == true) {
+					// sends the info
+					String message = change;
+					client.addNextChange(message);
+					// then empties the string to avoid overflow/overload
+					change = "none";
+				}
+				update.start();
 				clients.add(client);
 				System.out.println(players.size());
 			} catch (IOException ex) {

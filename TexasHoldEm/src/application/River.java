@@ -61,6 +61,21 @@ public class River
 	public void addCard(Card card)
 	{
 		riverCards.add(card);
+		
+		if(riverCards.size() == 5) {
+			updateImgs();
+		}
+	}
+	
+	// Adds a card to the river
+	public void addCard(String card)
+	{
+		if(card.indexOf(",") != -1) {
+			int suit = Integer.parseInt(card.substring(0, card.indexOf(",")));
+			int rank = Integer.parseInt(card.substring(card.indexOf(",") + 1));
+		
+			addCard(new Card(suit, rank));
+		}
 	}
 	
 	// Resets river
@@ -165,7 +180,6 @@ public class River
 	}
 	
 	public GridPane getPane() {
-		updateImgs();
 		return pane;
 	}
 }

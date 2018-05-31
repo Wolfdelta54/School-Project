@@ -283,6 +283,15 @@ public class Player {
 		}
 	} 
 	
+	public void addCard(String card) {
+		if(card.indexOf(",") != -1) {
+			int suit = Integer.parseInt(card.substring(0, card.indexOf(",")));
+			int rank = Integer.parseInt(card.substring(card.indexOf(",") + 1));
+		
+			addCard(new Card(suit, rank));
+		}
+	}
+	
 	public void setActive(boolean status) {
 		isActive = status;
 	}
