@@ -1,16 +1,19 @@
 package application;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collections; 
 
 public class HandCheck
 {
 	public ArrayList<Player> players;
 	public ArrayList<Card> availableCards; 
+	public ArrayList<Card> allCards;
 	public int pot; 
 	public Player winner;
-	
+	public ArrayList<Hand> hands = new ArrayList<Hand>(); 
+	public ArrayList<String> names = new ArrayList<String>();  
+	public Hand hand;
+	public ArrayList<String> handCombos = new ArrayList<String>();
 	
 	public HandCheck()
 	{
@@ -18,11 +21,7 @@ public class HandCheck
 		pot = 0; 
 	}
 	
-	public void addCard(Card card)
-	{
-		availableCards.add(card);
-	}
-
+	
 	public Card getCard(int i)
 	{
 		return availableCards.get(i);
@@ -36,47 +35,82 @@ public class HandCheck
 	public void setPlayers(ArrayList<Player> players)
 	{
 		this.players = players; 
+		for(int i=0; i<players.size(); i++)
+		{
+			this.hands.add(players.get(i).getHand()); 
+			this.names.add(players.get(i).getName());		
+			}
+			
 	}
 	
 	public void setCards(River river)
 	{
 		this.availableCards = river.getCards(); 
+		//availableCards.addAll(hand.getCards());
 	}
 	
-	
-	public String checkHands()
+	public void setList(int index)
 	{
-		String result = ""; 
-		ArrayList<Integer> rankCounter = new ArrayList<Integer>();
-		for(int i=0; i<14; i++)
-			rankCounter.add(0);
+		allCards = new ArrayList<Card>(); 
+		allCards.addAll(availableCards);
+		allCards.addAll(hands.get(index).getCards()); 
 		
-	    ArrayList<Integer> suitCounter = new ArrayList<Integer>();
-	    for(int i=0; i<4; i++)
-			suitCounter.add(0);
-	    
-		// Loop through sorted cards and total ranks
-        for(int i=0; i<availableCards.size();i++)
+	}
+	
+	public ArrayList<String> checkHands()
+	{
+		
+		for(int i=0; i<players.size(); i++)
+		{
+		String result = ""; 
+		setList(i); 
+		
+		int[] rankCounterArray = new int[15];
+        int[] suitCounterArray = new int[5];
+
+        // initializations
+        for (int j=0;j<rankCounterArray.length;j++)
         {
-        	if(availableCards.get(i).getRank() == 14)
-        	{
-        		rankCounter.add(0, (1+rankCounter.get(i))); 
-        		rankCounter.remove(rankCounter.size() - 1); 
-        	}
-        	
-            rankCounter.set(availableCards.get(i).getRank() -1,(1+rankCounter.get(i))); //ex. Queen will return 12. Therefore, array at the 12th position, or index 11, goes up 1 so subtract 1
-            // [0,0,0,0,0,0,0,0,0,0,0,0,0,0] 
-            // [A,2,3,4,5,6,7,8,9,10,J,Q,K,A]
-            // [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
-            // need to move ace into the first position
-            suitCounter.set(availableCards.get(i).getSuit() -1,(1+suitCounter.get(i))); //ex. spade will return 4. Therefore, array list at index 3 goes up so subtract 1
+            rankCounterArray[j] =0;
         }
+
+        for (int j=4;j<suitCounterArray.length;j++)
+        {
+            suitCounterArray[j] = 0;
+        }
+
+        // Loop through sorted cards and total ranks
+        for(int j=0; j<allCards.size();j++)
+        {
+            rankCounterArray[allCards.get(j).getRank()]++;
+            suitCounterArray[allCards.get(j).getSuit()]++;
+        }
+
+        ArrayList<Integer> rankCounter = new ArrayList<Integer>(); 
+        ArrayList<Integer> suitCounter = new ArrayList<Integer>();
+
+        for(int j=0; j<rankCounterArray.length; j++)
+        {
+        	rankCounter.add(rankCounterArray[j]);
+        }
+
+        for(int j=0; j<suitCounterArray.length; j++)
+        {
+        	suitCounter.add(suitCounterArray[j]);
+        }
+
+        //ex. Queen will return 12. Therefore, array at the 12th position, or index 11, goes up 1 so subtract 1
+        // [0,0,0,0,0,0,0,0,0,0,0,0,0,0] 
+        // [A,2,3,4,5,6,7,8,9,10,J,Q,K,A]
+        // [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
+        // need to move ace into the first position
+        //ex. spade will return 4. Therefore, array list at index 3 goes up so subtract 1
 
         //sort cards for evaluation
         Collections.sort(suitCounter);
         Collections.sort(rankCounter);
         //hands are already sorted by rank and suit for royal and straight flush checks.
-        
+
         //is royal flush?
         result = royalFlush1(rankCounter, suitCounter);
 
@@ -116,8 +150,11 @@ public class HandCheck
         //is highest hand? 
         if (result.length() == 0)
         	result = evaluateHighCard(rankCounter);
+			
+        handCombos.add(players.get(i).getName() + ";" + result);
+		}
         
-        return result; 
+        return handCombos; 
 	}
 
 	//ORDER OF SUITS = spades, hearts, clubs, diamond
@@ -132,49 +169,49 @@ public class HandCheck
                 rankCounter.get(0) >= 1)    //Ace
                 && (suitCounter.get(0) > 4 || suitCounter.get(1) > 4 ||
                         suitCounter.get(2) > 4 || suitCounter.get(3) > 4))
-			return "Royal Flush" + availableCards.get(1).getSuit(); 
+			return "Royal Flush" + allCards.get(1).getSuit(); 
 		return ""; 
 	}
 	private String royalFlush() 
 	{
-		for(int i=0; i<availableCards.size(); i++) //go through all available cards 
+		for(int i=0; i<allCards.size(); i++) //go through all available cards 
 		{
-				if(availableCards.get(i).getSuit() == 4) //checks to see if all are spades
+				if(allCards.get(i).getSuit() == 4) //checks to see if all are spades
 				{
-					if((availableCards.get(0).getRank() == 10 
-							&& availableCards.get(1).getRank() == 11 
-							&& availableCards.get(2).getRank() == 12 
-							&& availableCards.get(3).getRank() == 13 
-							&& availableCards.get(4).getRank() == 14 ))  //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
+					if((allCards.get(0).getRank() == 10 
+							&& allCards.get(1).getRank() == 11 
+							&& allCards.get(2).getRank() == 12 
+							&& allCards.get(3).getRank() == 13 
+							&& allCards.get(4).getRank() == 14 ))  //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Spades"; 
 				}
 				
-				if(availableCards.get(i).getSuit() == 3) //checks to see if all are hearts
+				if(allCards.get(i).getSuit() == 3) //checks to see if all are hearts
 				{
-					if((availableCards.get(0).getRank() == 10 
-							&& availableCards.get(1).getRank() == 11 
-							&& availableCards.get(2).getRank() == 12 
-							&& availableCards.get(3).getRank() == 13 
-							&& availableCards.get(4).getRank() == 14 )) //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
+					if((allCards.get(0).getRank() == 10 
+							&& allCards.get(1).getRank() == 11 
+							&& allCards.get(2).getRank() == 12 
+							&& allCards.get(3).getRank() == 13 
+							&& allCards.get(4).getRank() == 14 )) //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Hearts";
 				}
-				if(availableCards.get(i).getSuit() == 2) //checks to see if all are clubs
+				if(allCards.get(i).getSuit() == 2) //checks to see if all are clubs
 				{
-					if((availableCards.get(0).getRank() == 10 
-							&& availableCards.get(1).getRank() == 11 
-							&& availableCards.get(2).getRank() == 12 
-							&& availableCards.get(3).getRank() == 13 
-							&& availableCards.get(4).getRank() == 14 )) //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
+					if((allCards.get(0).getRank() == 10 
+							&& allCards.get(1).getRank() == 11 
+							&& allCards.get(2).getRank() == 12 
+							&& allCards.get(3).getRank() == 13 
+							&& allCards.get(4).getRank() == 14 )) //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Clubs";
 				}
 
-				if(availableCards.get(i).getSuit() == 1) //checks to see if all are diamond
+				if(allCards.get(i).getSuit() == 1) //checks to see if all are diamond
 				{
-					if((availableCards.get(0).getRank() == 10 
-							&& availableCards.get(1).getRank() == 11 
-							&& availableCards.get(2).getRank() == 12 
-							&& availableCards.get(3).getRank() == 13 
-							&& availableCards.get(4).getRank() == 14 )) //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
+					if((allCards.get(0).getRank() == 10 
+							&& allCards.get(1).getRank() == 11 
+							&& allCards.get(2).getRank() == 12 
+							&& allCards.get(3).getRank() == 13 
+							&& allCards.get(4).getRank() == 14 )) //Goes through cardRanks list and checks to see if cards meet the value requirements of a royal flush
 						return "Royal Flush Diamonds";
 				}
 		}
@@ -194,19 +231,19 @@ public class HandCheck
 	        	// min. requirements for a straight flush have been met.
 	        	// Loop through available cards looking for 5 consecutive cards of the same suit,
 	        	// start in reverse to get the highest value straight flush
-	        	for (int i=availableCards.size()-1;i>3;i--)
+	        	for (int i=allCards.size()-1;i>3;i--)
 	        	{
-	        		if ((availableCards.get(i).getRank()-1 == availableCards.get(i-1).getRank() && 
-	        				availableCards.get(i).getRank()-2 == availableCards.get(i-2).getRank() &&
-	        				availableCards.get(i).getRank()-3 == availableCards.get(i-3).getRank() &&
-	        				availableCards.get(i).getRank()-4 == availableCards.get(i-4).getRank()) 
+	        		if ((allCards.get(i).getRank()-1 == allCards.get(i-1).getRank() && 
+	        				allCards.get(i).getRank()-2 == allCards.get(i-2).getRank() &&
+	        				allCards.get(i).getRank()-3 == allCards.get(i-3).getRank() &&
+	        				allCards.get(i).getRank()-4 == allCards.get(i-4).getRank()) 
 	        				&&
-	        				(availableCards.get(i).getSuit() == availableCards.get(i-1).getSuit() &&
-	        				availableCards.get(i).getSuit() == availableCards.get(i-2).getSuit() &&
-	        				availableCards.get(i).getSuit() == availableCards.get(i-3).getSuit() &&
-	        				availableCards.get(i).getSuit() == availableCards.get(i-4).getSuit())){
+	        				(allCards.get(i).getSuit() == allCards.get(i-1).getSuit() &&
+	        				allCards.get(i).getSuit() == allCards.get(i-2).getSuit() &&
+	        				allCards.get(i).getSuit() == allCards.get(i-3).getSuit() &&
+	        				allCards.get(i).getSuit() == allCards.get(i-4).getSuit())){
 	        			// Found royal flush, break and return.
-	        			result = "Straight Flush!! " + availableCards.get(i).getSuit();
+	        			result = "Straight Flush!! " + allCards.get(i).getSuit();
 	        			break;
 	        		}
 	        	}
@@ -216,41 +253,41 @@ public class HandCheck
 	        
 	private String straightFlush()
 	{
-		for (int i=availableCards.size()-1;i>3;i--)
+		for (int i=allCards.size()-1;i>3;i--)
 		{
-			if(availableCards.get(i).getSuit() == 4) //checks to see if all are spades
+			if(allCards.get(i).getSuit() == 4) //checks to see if all are spades
 			{
-				if ((availableCards.get(i).getRank()- 1 == availableCards.get(i-1).getRank() && 
-						availableCards.get(i).getRank()- 2 == availableCards.get(i-2).getRank() &&
-						availableCards.get(i).getRank()- 3 == availableCards.get(i-3).getRank() &&
-						availableCards.get(i).getRank()- 4 == availableCards.get(i-4).getRank()))
+				if ((allCards.get(i).getRank()- 1 == allCards.get(i-1).getRank() && 
+						allCards.get(i).getRank()- 2 == allCards.get(i-2).getRank() &&
+						allCards.get(i).getRank()- 3 == allCards.get(i-3).getRank() &&
+						allCards.get(i).getRank()- 4 == allCards.get(i-4).getRank()))
 					return "Straight Flush Spades";
 			}
 			
-			if(availableCards.get(i).getSuit() == 3) //checks to see if all are hearts
+			if(allCards.get(i).getSuit() == 3) //checks to see if all are hearts
 			{
-				if ((availableCards.get(i).getRank()- 1 == availableCards.get(i-1).getRank() && 
-						availableCards.get(i).getRank()- 2 == availableCards.get(i-2).getRank() &&
-						availableCards.get(i).getRank()- 3 == availableCards.get(i-3).getRank() &&
-						availableCards.get(i).getRank()- 4 == availableCards.get(i-4).getRank()))
+				if ((allCards.get(i).getRank()- 1 == allCards.get(i-1).getRank() && 
+						allCards.get(i).getRank()- 2 == allCards.get(i-2).getRank() &&
+						allCards.get(i).getRank()- 3 == allCards.get(i-3).getRank() &&
+						allCards.get(i).getRank()- 4 == allCards.get(i-4).getRank()))
 					return "Straight Flush Hearts"; 
 			}
 			
-			if(availableCards.get(i).getSuit() == 2) //checks to see if all are clubs
+			if(allCards.get(i).getSuit() == 2) //checks to see if all are clubs
 			{
-				if ((availableCards.get(i).getRank()- 1 == availableCards.get(i-1).getRank() && 
-						availableCards.get(i).getRank()- 2 == availableCards.get(i-2).getRank() &&
-						availableCards.get(i).getRank()- 3 == availableCards.get(i-3).getRank() &&
-						availableCards.get(i).getRank()- 4 == availableCards.get(i-4).getRank()))
+				if ((allCards.get(i).getRank()- 1 == allCards.get(i-1).getRank() && 
+						allCards.get(i).getRank()- 2 == allCards.get(i-2).getRank() &&
+						allCards.get(i).getRank()- 3 == allCards.get(i-3).getRank() &&
+						allCards.get(i).getRank()- 4 == allCards.get(i-4).getRank()))
 					return "Straight Flush Clubs";
 			}
 			
-			if(availableCards.get(i).getSuit() == 1) //checks to see if all are diamonds
+			if(allCards.get(i).getSuit() == 1) //checks to see if all are diamonds
 			{
-				if ((availableCards.get(i).getRank()- 1 == availableCards.get(i-1).getRank() && 
-						availableCards.get(i).getRank()- 2 == availableCards.get(i-2).getRank() &&
-						availableCards.get(i).getRank()- 3 == availableCards.get(i-3).getRank() &&
-						availableCards.get(i).getRank()- 4 == availableCards.get(i-4).getRank()))
+				if ((allCards.get(i).getRank()- 1 == allCards.get(i-1).getRank() && 
+						allCards.get(i).getRank()- 2 == allCards.get(i-2).getRank() &&
+						allCards.get(i).getRank()- 3 == allCards.get(i-3).getRank() &&
+						allCards.get(i).getRank()- 4 == allCards.get(i-4).getRank()))
 					return "Straight Flush Diamonds";
 			}
 			
@@ -263,7 +300,7 @@ public class HandCheck
 	{
 			if((cardRanks.get(0) == cardRanks.get(1) && cardRanks.get(0) == cardRanks.get(2) && cardRanks.get(0) == cardRanks.get(3)) ||
 					(cardRanks.get(1) == cardRanks.get(2) && cardRanks.get(1) == cardRanks.get(3) && cardRanks.get(1) == cardRanks.get(4)))
-				return "Four of a Kind" + availableCards.get(2).getRank(); 
+				return "Four of a Kind " + allCards.get(2).getRank(); 
 			return ""; 
 			
 	}
