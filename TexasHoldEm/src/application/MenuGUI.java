@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JLabel;
 
@@ -12,6 +11,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -200,12 +200,39 @@ public class MenuGUI extends Application {
 				status.setText(play.isLive() + "");
 				
 				if(table.isLive() == false) {
-					Label test = new Label();
 					Scene wait = new Scene(clWaitPane, 300, 250);
 					primaryStage.setScene(wait);
-					AtomicInteger count = new AtomicInteger(-1);
 					
-					Thread waitThrd = new Thread(new Runnable() {
+					Task<Void> waitTask = new Task<Void>() {
+						@Override
+						public Void call() {
+							int stop = 0;
+							while(stop == 0) {
+								if(play.isLive() == true) {
+									System.out.println("srvrLive has changed, MenuGUI");
+									play.addHand();
+									
+									GridPane river = table.getRiverPane();
+									river.setTranslateX(312);
+									river.setTranslateY(180);
+									
+									play.getPane().getChildren().add(river);
+					
+									gameScene = play.getScene();
+									primaryStage.setScene(gameScene);
+										
+									stop = 1;
+								}
+								else {
+									stop = 0;
+								}
+							}
+							return null;
+						}
+					};
+					new Thread(waitTask).start();
+					
+				/*	Thread waitThrd = new Thread(new Runnable() {
 						public void run() {
 							int stop = 0;
 							while(stop == 0) {
@@ -213,7 +240,6 @@ public class MenuGUI extends Application {
 									Platform.runLater(new Runnable() {
 										public void run() {
 											System.out.println("srvrLive has changed, MenuGUI");
-											count.set(0);
 											play.addHand();
 									
 											GridPane river = table.getRiverPane();
@@ -234,7 +260,7 @@ public class MenuGUI extends Application {
 							}
 						}
 					});
-					waitThrd.start();
+					waitThrd.start(); */
 					
 			/*		play.srvrLiveProperty.addListener(new ChangeListener<Number>() {
 						@Override

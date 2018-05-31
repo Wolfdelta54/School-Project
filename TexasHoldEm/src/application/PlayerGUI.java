@@ -486,7 +486,6 @@ public class PlayerGUI implements Runnable {
 			ServerThread serverThread = new ServerThread(socket, userName); // Creates the serverThread
 			Thread serverAccessThread = new Thread(serverThread); // Creates a new thread out of the serverThread
 			serverAccessThread.start(); // Starts the thread which allows multiplayer connectivity
-			srvrLive = player.isLive();
 			
 			if(wasSent == false) {
 				serverThread.addPlayer(player);
