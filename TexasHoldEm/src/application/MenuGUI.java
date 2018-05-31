@@ -234,6 +234,7 @@ public class MenuGUI extends Application {
 							}
 						}
 					});
+					waitThrd.start();
 					
 			/*		play.srvrLiveProperty.addListener(new ChangeListener<Number>() {
 						@Override
