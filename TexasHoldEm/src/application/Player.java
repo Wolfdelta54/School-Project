@@ -124,7 +124,7 @@ public class Player {
 	//	FileInputStream img1;
 	//	FileInputStream img2;
 	//	try {
-		
+		if(handImgs.getChildren().isEmpty()) {
 			card1 = new ImageIcon(cards.get(0).getImage(cards.get(0).getSuit(), cards.get(0).getRank()));
 			card2 = new ImageIcon(cards.get(1).getImage(cards.get(1).getSuit(), cards.get(1).getRank()));
 			
@@ -158,6 +158,7 @@ public class Player {
 		
 			handImgs.add(card1Node, 0, 0);
 			handImgs.add(card2Node, 1, 0);
+		}
 	//	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 	//		e.printStackTrace();

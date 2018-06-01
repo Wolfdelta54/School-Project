@@ -31,6 +31,7 @@ public class HandCheck
 		{
 			this.hands.add(players.get(i).getHand()); 
 			this.names.add(players.get(i).getName());		
+			System.out.println(players.get(i).getHand().getCards().size());
 		}
 
 	}
@@ -87,7 +88,7 @@ public class HandCheck
 		
 		for(int i=0; i<players.size(); i++)
 		{
-		String result = ""; 
+		String results = ""; 
 	//	ArrayList<Card> list = getList(i);
 		setList(i); 
 		
@@ -138,46 +139,48 @@ public class HandCheck
         //hands are already sorted by rank and suit for royal and straight flush checks.
 
         //is royal flush?
-        result = royalFlush(rankCounter, suitCounter);
+        results = royalFlush(rankCounter, suitCounter);
 
         //is straight flush?
-        if (result.length() == 0)
-        	result = straightFlush(rankCounter, suitCounter); 
+        if (results.length() == 0)
+        	results = straightFlush(rankCounter, suitCounter); 
         //is four of a kind?
-        if (result.length() == 0)
-        	result = fourOfAKind(rankCounter);
+        if (results.length() == 0)
+        	results = fourOfAKind(rankCounter);
         //is full house?
-        if (result.length() == 0)
-        	result = fullHouse(rankCounter);
+        if (results.length() == 0)
+        	results = fullHouse(rankCounter);
         //is flush?
-        if (result.length() == 0)
-        	result = flush(rankCounter, suitCounter);
+        if (results.length() == 0)
+        	results = flush(rankCounter, suitCounter);
         //is straight?
-        if (result.length() == 0)
+        if (results.length() == 0)
         {
         	Collections.sort(rankCounter);
         	// re-sort by rank, up to this point we had sorted by rank and suit
         	// but a straight is suit independent.
-        	result = straight(rankCounter);
+        //	results = straight(rankCounter);
+        	results = straights(allCards);
         }
         //is three of a kind?
-        if (result.length() == 0)
-        	result = evaluateThreeOfAKind(rankCounter);
+        if (results.length() == 0)
+        	results = evaluateThreeOfAKind(rankCounter);
 
         //is two pair?
-        if (result.length() == 0)
-        	result = evaluateTwoPair(rankCounter);
+        if (results.length() == 0)
+        	results = evaluateTwoPair(rankCounter);
 
         //is one pair?
-        if (result.length() == 0)
-        	result = evaluateOnePair(rankCounter);
+        if (results.length() == 0)
+        	results = evaluateOnePair(rankCounter);
 
 
         //is highest hand? 
-        if (result.length() == 0)
-        	result = evaluateHighCard(rankCounter);
+        if (results.length() == 0)
+        	results = evaluateHighCard(rankCounter);
 			
-        handCombos.add(players.get(i).getName() + ";" + result);
+        System.out.println(players.get(i).getName() + ";" + results);
+        handCombos.add(players.get(i).getName() + ";" + results);
 		}
         
         return handCombos; 
@@ -417,6 +420,33 @@ public class HandCheck
 		return result;
 	}
 
+	//Straight - sequential order different suit
+private String straights(ArrayList<Card> cards)
+{
+	String result = "";
+	int[] ranks = new int[15];
+	for(int i = 0; i < 15; i++) {
+		ranks[i] = 0;
+	}
+	// loop through rank array to check for sequence
+	for (int i=0; i<cards.size(); i++)
+	{
+		ranks[cards.get(i).getRank()]++;
+	}
+	
+	for(int i = 1; i <= 10; i++) {
+		if(ranks[i] > 0 &&
+			ranks[i+1] > 0 &&
+			ranks[i+2] > 0 &&
+			ranks[i+3] > 0 &&
+			ranks[i+4] > 0) {
+			result = "Straight: high " + ranks[i+4];
+			break;
+		}
+	}
+	return result;
+}
+
 		//ThreeOfAKind - three of the same card
 	private String evaluateThreeOfAKind(ArrayList<Integer> rankCounter)
 	{
@@ -466,11 +496,11 @@ public class HandCheck
 			{
 				// because the aces are the highest cards yet 
 				// swap places so aces show first as highest pair
-				result = "Two Pair: " + allCards.get(secondPair).getRank() + "'s and " + allCards.get(firstPair).getRank() + "'s";
+				result = "Two Pair: " + /*allCards.get(secondPair).getRank()*/ secondPair + "'s and " + /*allCards.get(firstPair).getRank()*/ firstPair + "'s";
 			}
 			else 
 			{
-				result = "Two Pair: " + allCards.get(firstPair).getRank() + "'s and " + allCards.get(secondPair).getRank() + "'s";
+				result = "Two Pair: " + /*allCards.get(firstPair).getRank()*/ firstPair + "'s and " + /*allCards.get(secondPair).getRank()*/ secondPair + "'s";
 			}           
 		}
 
