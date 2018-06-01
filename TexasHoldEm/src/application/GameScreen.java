@@ -573,6 +573,7 @@ public class GameScreen {
 					players.get(i).rndBet = 0; // Resets the player's round bet
 				}
 				blinds(); // Calls blinds()
+				curRnd = 0;
 			}
 			else {
 				System.out.println("checkRndEnd updating UI");
@@ -588,9 +589,44 @@ public class GameScreen {
 		}
 	}
 	
+	// determine the winner
 	public void determineWinner(ArrayList<String> results) {
-		String topPlayer = "";
-		String topHand = "High Card";
+		ArrayList<String> topPlayers = new ArrayList<String>(); // back up storage incase of tie
+		String topPlayer = ""; // used to store the name of the person who has the current top hand
+		String topHand = "none"; // used to store the current top hand
+		int topPow = -1; // used to store the power of the top hand
+		
+		ArrayList<String> playerNames = new ArrayList<String>(); // used to store all player names and keep them lined up with their respective hand
+		ArrayList<String> playerHands = new ArrayList<String>(); // used to store all player hands and keep them lined up with their respective name
+		
+		for(int i = 0; i < results.size(); i++) {
+			String temp = results.get(i); // holds the information that is going to be stored
+			playerNames.add(temp.substring(0, temp.indexOf(";"))); // store the name into the array of names
+			playerHands.add(temp.substring(temp.indexOf(";") + 1)); // store the hand into the array of hands
+		}
+		
+		for(int i = 0; i < playerNames.size(); i++) {
+			String curPlay = playerNames.get(i); // hold the name of the player currently being evaluated
+			String curHand = playerHands.get(i); // hold the hand of the player currently being evaluated
+			int indOfPow = curHand.indexOf("p-") + 2; // index of power number
+			int pow = Integer.parseInt(curHand.substring(indOfPow)); // turn the power number (String) into an int
+			
+			if(pow > topPow) { // determine if the player has a more powerful hand
+				// store info if so
+				topPow = pow;
+				topHand = curHand.substring(0, curHand.indexOf(" p-"));
+				topPlayer = curPlay;
+			}
+		}
+		
+		// find the player with the strongest hand and give them the prize
+		for(int i = 0; i < players.size(); i++) {
+			if(players.get(i).getName().equals(topPlayer)) {
+				players.get(i).updateBal(pot);
+				pot = 0;
+				updatePot();
+			}
+		}
 	}
 	
 	public void resetAll() {
