@@ -307,7 +307,6 @@ public class MenuGUI extends Application {
 		
 		start.setOnAction(event -> {
 			if(table.getNumPlayers() > 1) {
-				System.out.println("MenuGUI > addListeners");
 				table.setLive(true);
 			
 		/*		String ipStorage = "0.0.0.0";
@@ -333,7 +332,7 @@ public class MenuGUI extends Application {
 				Thread playStart = new Thread(play);
 				playStart.start(); */
 				table.deal();
-				play.addHand();
+		//		play.addHand();
 				table.prntPlayers();
 				play.prntPlayer();
 				

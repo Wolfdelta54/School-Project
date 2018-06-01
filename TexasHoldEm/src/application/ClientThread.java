@@ -1,23 +1,27 @@
 package application;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class ClientThread implements Runnable
 {
 	private Socket socket;
 	private OutputStreamWriter clientOut;
+	private PrintWriter out;
 	private Table table;
 	private Player player;
 	private final LinkedList<String> changesToSend; // Used to store the players actions
 	private boolean hasMessages = false; // Stores actionsToSend.isEmpty()
 	private String change;
+	private ArrayList<ClientHandler> clientHandlers = new ArrayList<ClientHandler>();
 	
 	public ClientThread(Table table, Socket socket)
 	{
@@ -36,7 +40,6 @@ public class ClientThread implements Runnable
 			hasMessages = true;
 			changesToSend.push(change);
 			this.change = change;
-			System.out.println("Change sent to ServerThreads");
 		}
 	}
 	
@@ -46,7 +49,8 @@ public class ClientThread implements Runnable
 		try {
 			// setup
 	//		this.clientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
-			OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+	//		OutputStreamWriter thatClientOut = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 			@SuppressWarnings("resource")
 	//		Scanner in = new Scanner(socket.getInputStream()).useDelimiter("\\A");
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -88,8 +92,7 @@ public class ClientThread implements Runnable
 						 System.out.println(nextSend);
 					}
 					// Prints the other players' actions to the client's terminal
-					thatClientOut.write(nextSend + "\n");
-					thatClientOut.flush();
+					out.println(nextSend + "\n");
 				}
 			}
 			System.out.println("While loop as been closed");

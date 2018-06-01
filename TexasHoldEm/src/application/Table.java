@@ -24,6 +24,7 @@ public class Table implements Runnable /* extends Application */
 	
 	private int serverPort;
 	public List<ClientThread> clients;
+	public ArrayList<ClientHandler> handlers;
 	ArrayList<Boolean> hasMatched = new ArrayList<Boolean>(); // Used to determine if betting round has ended
 
 	private int pot = 0; // initializes pot to 0
@@ -74,7 +75,6 @@ public class Table implements Runnable /* extends Application */
 	
 	public void setLive(boolean x) {
 		srvrLive = x;
-		System.out.println("Table > setLive");
 		sendStatus();
 	}
 	
@@ -139,26 +139,24 @@ public class Table implements Runnable /* extends Application */
 			for(int j = 0; j < players.size(); j++)
 			{
 				Card nextCrd = deck.nextCard();
-				players.get(j).addCard(nextCrd); // adds a card to the player's deck
+				players.get(i).addCard(nextCrd); // adds a card to the player's deck
 				change = players.get(j).getName() + ";addCard;hand;" + nextCrd.change();
-				System.out.println(change);
 			}
 
 		}
-
 		
 		for(int i = 0; i < 5; i++)
 		{
+			Card nextCrd = deck.nextCard();
+			riverCards.addCard(nextCrd); // adds 5 cards to the river
 			for(int j = 0; j < players.size(); j++) {
-				Card nextCrd = deck.nextCard();
-				riverCards.addCard(nextCrd); // adds 5 cards to the river
 				change = players.get(j).getName() + ";addCard;river;" + nextCrd.change();
-				System.out.println(change);
 			}
 		}
 		
 		for(int i = 0; i < players.size(); i++) {
-			change = players.get(i).getName() + ";river;fifth";
+			if(riverCards.getCards().size() == 5)
+				change = "all;river;fifth";
 		}
 		riverCards.updateImgs();
 		riverImgs = riverCards.getCardNodes();
@@ -332,6 +330,7 @@ public class Table implements Runnable /* extends Application */
 	@Override
 	public void run() {
 		clients = new ArrayList<ClientThread>();
+		handlers = new ArrayList<ClientHandler>();
 		
 		ServerSocket serverSocket = null;
 		
@@ -381,10 +380,10 @@ public class Table implements Runnable /* extends Application */
 				});
 				update.start();
 				
-				if(hasChange == true) {
+				/*if(hasChange == true) {
 					sendChange(client, change);
 					hasChange = false;
-				}
+				}*/
 				
 				clients.add(client);
 				System.out.println(players.size());

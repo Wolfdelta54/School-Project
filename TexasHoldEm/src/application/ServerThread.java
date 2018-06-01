@@ -64,7 +64,6 @@ public class ServerThread implements Runnable
 					// Prints the player's action to the client's terminal
 					String change = in.readLine().replace("\n", "");
 					System.out.println(change);
-					System.out.println("Change received from ClientThread and sent to GUI");
 					this.gui.applyChange(change);
 				}
 				if(hasMessages)

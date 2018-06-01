@@ -53,7 +53,6 @@ public class Player {
 	
 	public void setLive(boolean newStatus) {
 		srvrLive = newStatus;
-		System.out.println("Player > setLive");
 	}
 	
 	public int getCurPot() {

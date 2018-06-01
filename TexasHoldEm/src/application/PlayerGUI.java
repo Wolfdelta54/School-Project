@@ -63,9 +63,7 @@ public class PlayerGUI implements Runnable {
 	
 	// River GUI components
 	public GridPane riverPane = new GridPane();
-	public ArrayList<SwingNode> riverNodes = new ArrayList<SwingNode>();
-	public ArrayList<ImageIcon> riverIcons = new ArrayList<ImageIcon>();
-	public ArrayList<String> riverCards = new ArrayList<String>();
+	public ArrayList<SwingNode> riverNodes;
 	
 	public River river = new River();
 	
@@ -82,8 +80,6 @@ public class PlayerGUI implements Runnable {
         potAutoUpdate();
         
         riverPane = river.getPane();
-        riverNodes = river.getCardNodes();
-        riverIcons = river.getCardList();
         
         srvrLiveProperty.set(0);
         
@@ -116,8 +112,6 @@ public class PlayerGUI implements Runnable {
         setUpBtns();
         
         riverPane = river.getPane();
-        riverNodes = river.getCardNodes();
-        riverIcons = river.getCardList();
         
 		riverPane.setTranslateX(312);
 		riverPane.setTranslateY(180);
@@ -421,12 +415,19 @@ public class PlayerGUI implements Runnable {
 	}
 	
 	public void updateVars() {
-		String potTxt = potLbl.getText();
-		potVal = Integer.parseInt(potTxt.substring(potTxt.indexOf("$") + 1));
-		if(potVal != player.getCurPot()) {
-			potVal = player.getCurPot();
-			potLbl.setText("$" + potVal);
-		}
+		Thread potUpdate = new Thread(new Runnable() {
+			public void run() {
+				while(true) {
+					String potTxt = potLbl.getText();
+					potVal = Integer.parseInt(potTxt.substring(potTxt.indexOf("$") + 1));
+					if(potVal != player.getCurPot()) {
+						potVal = player.getCurPot();
+						potLbl.setText("$" + potVal);
+					}
+				}
+			}
+		});
+		potUpdate.start();
 		
 		if(curBet != player.getCurBet()) {
 			curBet = player.getCurBet();
@@ -455,7 +456,6 @@ public class PlayerGUI implements Runnable {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -466,10 +466,16 @@ public class PlayerGUI implements Runnable {
 	
 	public void addToRiver(String cardStr) {
 		river.addCard(cardStr);
+		if(river.getCards().size() == 5) {
+			river.updateImgs();
+			riverNodes = river.getCardNodes();
+		}
+		System.out.println("Added to river");
 	}
 	
 	public void addToHand(String card) {
 		player.addCard(card);
+		System.out.println("Added to hand");
 	}
 	
 	public void showRiver(int rnd) {
@@ -509,7 +515,6 @@ public class PlayerGUI implements Runnable {
 	
 	public void applyChange(String change) {
 	//	input = input.replace("\n", "");
-		System.out.println("Change received from ServerThread");
 		if(change.indexOf(";") != -1) {
 		String user = change.substring(0, change.indexOf(";")); // Get the username of who executed the action
 		String action = ""; // Get the action executed
@@ -532,13 +537,16 @@ public class PlayerGUI implements Runnable {
 				else if(action.equalsIgnoreCase("addCard") && user.equals(player.getName())) {
 					change = change.replace(action + ";", "");
 					location = change.substring(0, change.indexOf(";"));
+				//	card = change.replace(location + ";", "");
 				
 					if(location.equals("river")) {
-						card = location.substring(location.indexOf(";") + 1);
+						card = change.substring(change.indexOf(";") + 1);
+						System.out.println("Card sent to addToRiver");
 						addToRiver(card);
 					}
 					else if(location.equals("hand")) {
-						card = location.substring(location.indexOf(";") + 1);
+						card = change.substring(change.indexOf(";") + 1);
+						System.out.println("Card sent to addToHand");
 						addToHand(card);
 					}
 				}
@@ -567,12 +575,12 @@ public class PlayerGUI implements Runnable {
 						showRiver(3);
 					}
 				}
-				else if(action.equalsIgnoreCase("reset") && user.equals("all")) {
-					resetAll();
-				}
 			}
 			else {
-				action = change.substring(change.indexOf(";") + 1);
+				action = change.substring(0); 
+				if(action.equalsIgnoreCase("reset") && user.equals("all")) {
+					resetAll();
+				}
 			}
 		}
 	}
@@ -627,7 +635,7 @@ public class PlayerGUI implements Runnable {
 				serverThread.addPlayer(player);
 				serverThread.addPlayerGUI(this);
 				wasSent = true;
-			}
+			} 
 			// as long as the serverAccessThread is running (alive) the program will go through the loop
 			while(serverAccessThread.isAlive()) {
 				// if actions is not empty than it will send the info

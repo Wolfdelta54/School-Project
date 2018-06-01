@@ -29,6 +29,12 @@ public class River
 	public SwingNode card4Node = new SwingNode();
 	public SwingNode card5Node = new SwingNode();
 	public ArrayList<SwingNode> cardNodes = new ArrayList<SwingNode>();
+
+	public JLabel card1Lbl = new JLabel();
+	public JLabel card2Lbl = new JLabel();
+	public JLabel card3Lbl = new JLabel();
+	public JLabel card4Lbl = new JLabel();
+	public JLabel card5Lbl = new JLabel();
 	
 	// Creates the river
 	public River()
@@ -45,6 +51,18 @@ public class River
 		cardNodes.add(card3Node);
 		cardNodes.add(card4Node);
 		cardNodes.add(card5Node);
+		
+		card1Node.setContent(card1Lbl);
+		card2Node.setContent(card2Lbl);
+		card3Node.setContent(card3Lbl);
+		card4Node.setContent(card4Lbl);
+		card5Node.setContent(card5Lbl);
+		
+		pane.add(card1Node, 0, 0);
+		pane.add(card2Node, 1, 0);
+		pane.add(card3Node, 2, 0);
+		pane.add(card4Node, 3, 0);
+		pane.add(card5Node, 4, 0);
 	}
 	public River(String tester){
 		riverCards = new ArrayList<Card>();
@@ -63,15 +81,12 @@ public class River
 	public void addCard(Card card)
 	{
 		riverCards.add(card);
-		
-		/*if(riverCards.size() == 5) {
-			updateImgs();
-		}*/
 	}
 	
 	// Adds a card to the river
 	public void addCard(String card)
 	{
+		System.out.println(card);
 		if(card.indexOf(",") != -1) {
 			int suit = Integer.parseInt(card.substring(0, card.indexOf(",")));
 			int rank = Integer.parseInt(card.substring(card.indexOf(",") + 1));
@@ -129,21 +144,11 @@ public class River
 			Image card5ImgFin = card5Img.getScaledInstance(75, 109, Image.SCALE_SMOOTH);
 			card5.setImage(card5ImgFin);
 			
-			JLabel card1Lbl = new JLabel(card1);
-			JLabel card2Lbl = new JLabel(card2);
-			JLabel card3Lbl = new JLabel(card3);
-			JLabel card4Lbl = new JLabel(card4);
-			JLabel card5Lbl = new JLabel(card5);
-			
-			card1Node.setContent(card1Lbl);
-			card2Node.setContent(card2Lbl);
-			card3Node.setContent(card3Lbl);
-			card4Node.setContent(card4Lbl);
-			card5Node.setContent(card5Lbl);
-			
-			if(pane.getChildren().contains(card1Node)) {
-				pane.getChildren().removeAll(card1Node, card2Node, card3Node, card4Node, card5Node);
-			}
+			card1Lbl.setIcon(card1);
+			card2Lbl.setIcon(card2);
+			card3Lbl.setIcon(card3);
+			card4Lbl.setIcon(card4);
+			card5Lbl.setIcon(card5);
 		
 	/*		card1.setFitWidth(75);
 			card1.setPreserveRatio(true);
@@ -169,12 +174,6 @@ public class River
 			card5.setPreserveRatio(true);
 			card5.setSmooth(true);
 			card5.setCache(true); */
-		
-			pane.add(card1Node, 0, 0);
-			pane.add(card2Node, 1, 0);
-			pane.add(card3Node, 2, 0);
-			pane.add(card4Node, 3, 0);
-			pane.add(card5Node, 4, 0);
 	//	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 	//		e.printStackTrace();
