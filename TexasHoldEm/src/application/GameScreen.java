@@ -23,6 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 public class GameScreen {
@@ -35,7 +36,7 @@ public class GameScreen {
 	public ImageView bgImage = new ImageView();
 	public Button fold =  new Button("Fold"), bet =  new Button("Bet"), raise =  new Button("Raise"),
 			 call =  new Button("Call"), check =  new Button("Check"); // Buttons for the various curPlayer actions
-	public Label balance = new Label(); // Visual representation of the curPlayer's balance
+	public Label balance = new Label(), user = new Label(); // Visual representation of the curPlayer's balance
 	public TextField betAmount = new TextField("0"); // Used for betting/raising
 	public Button stand = new Button("Stand Up"), leave = new Button("Leave Server"); // Buttons for game exiting
 	public Pane spring = new Pane(); // Used to create an empty column
@@ -151,6 +152,7 @@ public class GameScreen {
         gameStage.getChildren().add(handPane);
         // Set balance label text
         balance.setText("$" + curPlayer.getBal());
+        user.setText(curPlayer.getName());
 	//	updateVars();
 	}
 	
@@ -430,9 +432,16 @@ public class GameScreen {
 	// If there is no current bet than the Check and Bet buttons are present
 	// If there is a current bet than the Call and Raise buttons are present
 	public void setUpBtns() {
+		balance.setFont(new Font(12));
+		balance.setTextFill(Paint.valueOf("WHITE"));
+		
+
+		user.setFont(new Font(12));
+		user.setTextFill(Paint.valueOf("WHITE"));
 		
 		// Add the normal buttons to the GUI
-		gameActions.add(balance, 0, 0);
+		gameActions.add(user, 0, 0);
+		gameActions.add(balance, 1, 0);
 		gameActions.add(fold, 0, 1);
 		gameActions.add(betAmount, 2, 0);
 		
