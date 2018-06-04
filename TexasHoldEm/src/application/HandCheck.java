@@ -272,7 +272,7 @@ public class HandCheck
 	        				allCards.get(i).getSuit() == allCards.get(i-3).getSuit() &&
 	        				allCards.get(i).getSuit() == allCards.get(i-4).getSuit())){
 	        			// Found royal flush, break and return.
-	        			result = "Straight Flush!! " + allCards.get(i).getSuit() + " p-9";
+	        			result = "Straight Flush!! " + allCards.get(i).getSuit() + " p-9"; 
 	        			break;
 	        		}
 	        	}
